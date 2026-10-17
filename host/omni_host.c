@@ -128,8 +128,9 @@ int plat_store_save(uint32_t obj, const void *src, uint32_t len)
     return 0;
 }
 
-static uint32_t cpu_pct;
+static uint32_t cpu_pct, cpu_peak;
 uint32_t plat_cpu_pct(void) { return cpu_pct; }
+uint32_t plat_cpu_peak(int reset) { uint32_t p = cpu_peak; if (reset) cpu_peak = 0; return p; }
 uint32_t plat_xruns(void) { return 0; }
 
 /* -------------------------------------------------------------- app --- */
@@ -293,6 +294,7 @@ static void run_ms(uint32_t ms)
             render_ns_total += dt;
             render_budget_ns_total += 256.0 * 1e9 / 44100.0;
             cpu_pct = (uint32_t)(100.0 * dt / (256.0 * 1e9 / 44100.0));
+            if (cpu_pct > cpu_peak) cpu_peak = cpu_pct;
             for (k = 0; k < 256; k++) {
                 float l = (float)blk[2 * k] / 8388608.0f, r = (float)blk[2 * k + 1] / 8388608.0f;
                 int16_t s[2];
@@ -350,12 +352,14 @@ static int expect(const char *what, const char *val)
     else if (!strcmp(what,"step")) got=om_seq_step;
     else if (!strcmp(what,"tempo")) got=om_seq_bpm;
     else if (!strcmp(what,"ticks")) got=(int)om_seq_ticks;
-    else if (!strncmp(what,"mask",4) && atoi(what+4)<16) got=(int)om_seq_mask[atoi(what+4)];
+    else if (!strncmp(what,"mask",4) && atoi(what+4)<OM_STEPS) got=(int)om_seq_keys(om_seq_selected(),atoi(what+4));
+    else if (!strcmp(what,"track")) got=om_seq_selected();
     else if (!strcmp(what,"active")) got=(int)om_active_keys;
     else if (!strcmp(what,"bank")) got=om_bank();
     else if (!strcmp(what,"bend")) got=ui.bend_sent;
     else if (!strcmp(what,"last")) got=ui.last;
     else if (!strcmp(what,"puffs")) got=(int)ui.puff_count;
+    else if (!strcmp(what,"caption_meter")) got=ui.message && !strcmp(ui.message,"AUDIO LOAD (FX)");
     else if (!strcmp(what,"puff_mask")) got=(int)ui.puff_mask;
     else if (!strcmp(what,"dropped")) got=(int)om_dropped;
     else if (!strcmp(what,"store_writes")) got=(int)store_writes;

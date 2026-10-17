@@ -8,9 +8,10 @@ static struct {
     uint8_t puff_mask,next_puff,rec_held,rec_cleared;
     uint32_t rec_down_ms,seq_signature,bend_ms,bend_step_ms;
     int bend_knob,bend_midi,bend_sent;
+    uint32_t meter_ms;                     /* FX held: the CPU meter, refreshed every 200 ms */
     int tempo,status_dirty;
     int last,redraw,scene_dirty,caption_dirty,controls_dirty;
-    const char *message; char sub[24];
+    const char *message; char sub[40];
 } ui;
 static void decimal(int v,char *b) { char t[12]; int n=0; do { t[n++]=(char)('0'+v%10); v/=10; }while(v); while(n) *b++=t[--n]; *b=0; }
 int ui_dirty(void) { return 0; }
@@ -33,6 +34,15 @@ static void show_hit(int k) {
     ui.next_puff=(uint8_t)((slot+1u)%FMO_PUFFS); ui.puff_count++;
     ui.scene_dirty=1;
 }
+/* Hold FX: audio load now and the worst block since FX went down, xruns since boot, voices sounding. */
+static char *put(char *s,const char *t) { while(*t)*s++=*t++; *s=0; return s; }
+static char *put_n(char *s,uint32_t v) { decimal((int)v,s); while(*s)s++; return s; }
+static void meter(void) {
+    char *s=ui.sub;
+    s=put(s,"CPU ");s=put_n(s,plat_cpu_pct());s=put(s,"%  PEAK ");s=put_n(s,plat_cpu_peak(0));
+    s=put(s,"%  XRUN ");s=put_n(s,plat_xruns());s=put(s,"  V ");put_n(s,(uint32_t)om_voices_active());
+    ui.message="AUDIO LOAD (FX)"; ui.deadline=plat_ms()+400u; ui.caption_dirty=1;
+}
 static void trigger_key(int k,int velocity) {om_trigger(k,velocity);show_hit(k);}
 static void quiet(void) { om_panic(); ui.puff_mask=0; ui.scene_dirty=1; }
 void ui_input_only(void) {
@@ -46,11 +56,21 @@ void ui_input_only(void) {
     if(pressed & (1u<<B_REC)) {ui.rec_held=1;ui.rec_cleared=0;ui.rec_down_ms=plat_ms();}
     if(ui.rec_held && (buttons & (1u<<B_REC)) && !ui.rec_cleared && plat_ms()-ui.rec_down_ms>=1000u) {
         om_seq_clear();ui.rec_cleared=1;ui.puff_mask=0;ui.scene_dirty=1;
-        ui_say("LOOP CLEARED","READY TO RECORD");
+        ui_say("TRACK CLEARED","TAP REC TO RECORD");
     }
     if(released & (1u<<B_REC)) {
         if(ui.rec_held && !ui.rec_cleared)om_seq_toggle_record();
         ui.rec_held=0;
+    }
+    if(pressed & (1u<<B_FX)) {plat_cpu_peak(1);ui.meter_ms=now-200u;}
+    if((buttons & (1u<<B_FX)) && now-ui.meter_ms>=200u) {ui.meter_ms=now;meter();}
+    if(released & (1u<<B_FX)) {ui.message=0;ui.caption_dirty=1;}
+    if(buttons & (1u<<B_SEL)) {        /* SEL + white keys 1-4: the track to record into; its cat plays */
+        for(k=0;k<OM_TRACKS;k++) if(down & (1u<<WHITE_K[k])) {
+            char name[8]={'T','R','A','C','K',' ',(char)('1'+k),0};
+            om_seq_select(k); ui_say(name,om_bank_name(om_bank())); ui.status_dirty=1;
+        }
+        down=0;
     }
     for(k=0;k<NKEYS;k++) if(down & (1u<<k)) trigger_key(k,127);
     for(k=0;k<NKEYS;k++) if(up & (1u<<k)) om_release(k);
@@ -127,15 +147,16 @@ static void draw_status(void) {
     char text[40],number[12];int n=0,i;
     const char *mode=om_seq_recording?"REC ":om_seq_playing?"PLAY ":"STOP ";
     if(om_placeholder()){text[n++]='T';text[n++]=' ';}
+    text[n++]='T';text[n++]=(char)('1'+om_seq_selected());text[n++]=' ';
     for(i=0;om_bank_name(om_bank())[i];i++)text[n++]=om_bank_name(om_bank())[i];
     text[n++]=' ';
     while(*mode)text[n++]=*mode++;
     decimal(om_seq_bpm,number);for(i=0;number[i];i++)text[n++]=number[i];
     text[n++]=' ';text[n++]='B';text[n++]='P';text[n++]='M';
     if(om_seq_playing) {
-        int step=om_seq_step+1;
+        int step=om_seq_step+1,len=om_seq_track(om_seq_selected())->len;
         text[n++]=' ';text[n++]=(char)('0'+step/10);text[n++]=(char)('0'+step%10);
-        text[n++]='/';text[n++]='1';text[n++]='6';
+        text[n++]='/';text[n++]=(char)('0'+len/10);text[n++]=(char)('0'+len%10);
     }
     text[n]=0;
     cv_begin(240,16,FMO_INK);
@@ -151,7 +172,7 @@ void ui_frame(void) {
         ui.puff_mask&=(uint8_t)~(1u<<i); ui.scene_dirty=1;
     }
     {
-        uint32_t sig=((uint32_t)om_bank()<<24)|((uint32_t)om_seq_bpm<<16)|((uint32_t)om_seq_step<<2)|((uint32_t)om_seq_playing<<1)|om_seq_recording;
+        uint32_t sig=((uint32_t)om_seq_selected()<<28)|((uint32_t)om_bank()<<24)|((uint32_t)om_seq_bpm<<16)|((uint32_t)om_seq_step<<2)|((uint32_t)om_seq_playing<<1)|om_seq_recording;
         if(sig!=ui.seq_signature){ui.seq_signature=sig;ui.status_dirty=1;}
     }
     if(ui.redraw) {

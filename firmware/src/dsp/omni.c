@@ -22,7 +22,7 @@ static volatile uint8_t bank;                 /* written by the main loop only; 
 static volatile float bend_mul = 1.0f;        /* the same: pitch bend as a frequency ratio */
 int om_bank_count(void) { return CP_NBANKS; }
 int om_bank(void) { return bank; }
-void om_set_bank(int b) { if (b >= 0 && b < CP_NBANKS) bank = (uint8_t)b; }
+
 const char *om_bank_name(int b) { return b >= 0 && b < CP_NBANKS ? cp_banks[b].name : ""; }
 int om_bank_note0(void) { return cp_banks[bank].note0; }
 void om_set_bend(int cents) { bend_mul = fm_exp2f((float)(cents < -1200 ? -1200 : cents > 1200 ? 1200 : cents) * (1.0f / 1200.0f)); }
@@ -43,17 +43,21 @@ const char *om_sample_name(int k)
 }
 int om_placeholder(void) { return FMO_PLACEHOLDER; }
 volatile uint32_t om_active_keys, om_triggers, om_dropped;
+static volatile uint8_t voices_active;
+int om_voices_active(void) { return voices_active; }
 #define QN 128u
 #define BARRIER() __asm__ volatile("" ::: "memory")
-typedef struct { int type, a, b; } command_t;
+typedef struct { int type, a, b, c, d; } command_t;
 static command_t queue[QN];
 static volatile uint32_t qw, qr, panic_pending;
 static int par[P_NPARAMS];
 static float rev_mix, echo_mix, feedback, delay_frames;
 /* A voice reads one take: pos in source frames (Q16), advanced by inc per output frame. The ADPCM decoder has
  * decoded up to sample n (h1 = s1 = its value, h2 = s0 = sample n - 1's); sample n + 1 is nibble j of the frame at
- * byte fo. held: a key is down, so the take loops. */
-typedef struct { const cp_take_t *t; const int16_t *c; uint32_t pos, inc, age, fo; int32_t n, h1, h2; float s0, s1; int j, held, key, active; float gain; } voice_t;
+ * byte fo. hold: samples it still loops its take for (HOLD_LIVE: until its key goes up; 0: it plays out).
+ * owner: 0 live, 1 + n track n of the sequencer (a key up ends only live notes). */
+#define HOLD_LIVE 0xFFFFFFFFu
+typedef struct { const cp_take_t *t; const int16_t *c; uint32_t pos, inc, age, fo, hold; int32_t n, h1, h2; float s0, s1; int j, key, owner, active; float gain; } voice_t;
 /* Decode the voice's next sample (tools/import_samples.py adpcm_decode, bit for bit). */
 static void adpcm_next(voice_t *v)
 {
@@ -70,15 +74,10 @@ static uint32_t age;
 #define ECHO_N 22052u
 static float echo[ECHO_N] OM_POOL;
 static uint32_t echo_pos;
-/* Fractional sixteenth clock: increment bpm*4 per output sample, wrap at 60*44100.
- * Keeping the fractional remainder avoids drift at tempos not dividing the rate. */
-#define SEQ_PHASE 2646000u
 volatile uint8_t om_seq_playing, om_seq_recording, om_seq_step;
 volatile uint16_t om_seq_bpm;
-volatile uint32_t om_seq_mask[FMO_STEPS], om_seq_ticks, om_seq_hit_dropped;
-static uint32_t seq_phase, seq_skip[FMO_STEPS];
+volatile uint32_t om_seq_ticks, om_seq_hit_dropped;
 static volatile uint32_t seq_epoch;
-static uint8_t seq_velocity[FMO_STEPS][FMO_KEYS];
 #define HIT_Q 64u
 static struct { int key; uint32_t epoch; } seq_hits[HIT_Q];
 static volatile uint32_t hit_w, hit_r;
@@ -97,48 +96,37 @@ static void seq_report(int key) {
     seq_hits[w%HIT_Q].key=key; seq_hits[w%HIT_Q].epoch=seq_epoch;
     BARRIER();hit_w=w+1u;
 }
-static void seq_stop(void) {
-    int i;om_seq_playing=om_seq_recording=0;om_seq_step=0;seq_phase=0;seq_epoch++;
-    for(i=0;i<FMO_STEPS;i++)seq_skip[i]=0;
-}
-static void seq_erase(void) {
-    int i,j;
-    for(i=0;i<FMO_STEPS;i++) {om_seq_mask[i]=seq_skip[i]=0;for(j=0;j<FMO_KEYS;j++)seq_velocity[i][j]=0;}
-}
-static void start_voice(int key,int velocity,int held) {
-    uint32_t j;int s=0; const cp_key_t *k=&cp_banks[bank].keys[key];
-    uint32_t a=cp_banks[bank].anchor0+k->anchor; const cp_anchor_t *an=&cp_anchors[a];
+/* a voice for a note: a free one, else the oldest of the same owner (a track steals from itself first), else the
+ * oldest of all */
+static void start_voice(int bk,int key,int velocity,uint32_t hold,int owner) {
+    uint32_t j;int s=-1,own=-1; const cp_key_t *k=&cp_banks[bk].keys[key];
+    uint32_t a=cp_banks[bk].anchor0+k->anchor; const cp_anchor_t *an=&cp_anchors[a];
     voice_t *v;
-    for(j=0;j<FMO_VOICES;j++) {if(!voices[j].active){s=(int)j;break;}
-        if(voices[j].age<voices[s].age)s=(int)j;}
+    for(j=0;j<FMO_VOICES && s<0;j++) if(!voices[j].active) s=(int)j;
+    if(s<0) {
+        for(j=0;j<FMO_VOICES;j++) if(voices[j].owner==owner && (own<0 || voices[j].age<voices[own].age)) own=(int)j;
+        for(s=0,j=1;j<FMO_VOICES;j++) if(voices[j].age<voices[s].age) s=(int)j;
+        if(own>=0 && owner) s=own;
+    }
     v=&voices[s];
     {uint32_t ti=cp_take_ref[an->ref+rr[a]%an->ntakes]; v->t=&cp_takes[ti]; v->c=cp_preds[ti];} rr[a]++;
     v->pos=0; v->inc=k->inc_q16; v->age=++age; v->n=-1; v->h1=v->h2=0; v->s0=v->s1=0.0f; v->fo=v->t->off; v->j=0;
-    v->held=held; v->key=key; v->active=1; v->gain=(float)velocity*(1.0f/127.0f); om_triggers++;
+    v->hold=hold; v->key=key; v->owner=owner; v->active=1; v->gain=(float)velocity*(1.0f/127.0f); om_triggers++;
 }
-static void seq_fire(void) {
-    int k;uint32_t mask=om_seq_mask[om_seq_step]&~seq_skip[om_seq_step];
-    seq_skip[om_seq_step]=0;om_seq_ticks++;
-    for(k=0;k<FMO_KEYS;k++)if(mask&(1u<<k)) {start_voice(k,seq_velocity[om_seq_step][k],0);seq_report(k);}
+#include "seq.c"
+static void seq_stop(void) {
+    uint32_t k;om_seq_playing=om_seq_recording=0;om_seq_step=0;seq_epoch++;seq_reset();
+    for(k=0;k<OM_TRACKS;k++)om_seq_pos[k]=0;
+    for(k=0;k<FMO_KEYS;k++)rec[k].on=0;
 }
-static void seq_start(void) {
-    om_seq_step=0;seq_phase=0;om_seq_playing=1;seq_fire();
-}
-static void seq_record_hit(int key,int velocity) {
-    uint32_t step=om_seq_step;
-    /* Every key is its own pitch, so every key is its own slot. */
-    if(seq_phase>=SEQ_PHASE/2u)step=(step+1u)%FMO_STEPS;
-    om_seq_mask[step]|=1u<<key;seq_velocity[step][key]=(uint8_t)velocity;
-    /* Live audio already sounded: do not echo a newly quantized-ahead note again
-     * at the imminent boundary. It joins playback on the next circuit. */
-    if(step!=om_seq_step)seq_skip[step]|=1u<<key;
-}
-static void post(int type, int a, int b) {
+static void seq_start(void) { seq_reset(); om_seq_playing=1; }
+static void post4(int type, int a, int b, int c, int d) {
     uint32_t w = qw;
     if (w - qr >= QN) { om_dropped++; return; }
-    queue[w % QN] = (command_t){type,a,b};
+    queue[w % QN] = (command_t){type,a,b,c,d};
     BARRIER(); qw = w + 1u;
 }
+static void post(int type, int a, int b) { post4(type,a,b,0,0); }
 void om_set(int p, int v) { if (p >= 0 && p < P_NPARAMS) post(1,p,v); }
 void om_trigger(int k, int v) { if (k >= 0 && k < FMO_KEYS && v > 0) post(0,k,v > 127 ? 127 : v); }
 void om_release(int k) { if (k >= 0 && k < FMO_KEYS) post(6,k,0); }
@@ -146,6 +134,15 @@ void om_seq_toggle_play(void) {post(2,0,0);}
 void om_seq_toggle_record(void) {post(3,0,0);}
 void om_seq_clear(void) {post(4,0,0);}
 void om_seq_set_tempo(int bpm) {post(5,bpm,0);}
+void om_set_bank(int b) { if (b >= 0 && b < CP_NBANKS) { bank = (uint8_t)b; post4(8,seq_sel,OM_T_BANK,b,0); } }
+void om_seq_select(int t) { if (t >= 0 && t < OM_TRACKS) { bank = pat[t].bank; post(7,t,0); } }
+void om_seq_set(int t, int what, int v) { if (t >= 0 && t < OM_TRACKS) post4(8,t,what,v,0); }
+void om_seq_note(int t, int i, int key, int vel, int len) {
+    if (t >= 0 && t < OM_TRACKS && i >= 0 && i < OM_STEPS && key >= 0 && key < FMO_KEYS) post4(9,t,i,key,(vel & 255) | len << 8);
+}
+void om_seq_step_set(int t, int i, int what, int v) { if (t >= 0 && t < OM_TRACKS && i >= 0 && i < OM_STEPS) post4(10,t,i,what,v); }
+void om_seq_erase(int t, int i) { if (t >= 0 && t < OM_TRACKS && i < OM_STEPS) post(11,t,i); }
+void om_seq_set_fill(int on) { post(12,on,0); }
 void om_panic(void) { panic_pending = 1; }
 static void clear_sound(void) {
     uint32_t i;
@@ -158,8 +155,8 @@ void om_init(void) {
     for(i=0;i<P_NPARAMS;i++) par[i]=params[i].def;
     rev_mix=(float)par[P_REVERB]*0.01f; echo_mix=(float)par[P_DELAY]*0.01f;
     feedback=(float)par[P_FEEDBACK]*0.01f; delay_frames=(float)par[P_TIME]*44.1f;
-    seq_phase=seq_epoch=hit_w=hit_r=om_seq_ticks=om_seq_hit_dropped=0;
-    om_seq_playing=om_seq_recording=om_seq_step=0;om_seq_bpm=120;seq_erase();
+    seq_epoch=hit_w=hit_r=om_seq_ticks=om_seq_hit_dropped=0;bank=0;
+    om_seq_bpm=120;seq_patterns_init();seq_stop();
     clear_sound();
 }
 static float limit(float x) { return x > 0.98f ? 0.98f : x < -0.98f ? -0.98f : x; }
@@ -170,27 +167,33 @@ void om_render(int32_t *out, uint32_t n, uint32_t gain_q12) {
         command_t c; BARRIER(); c=queue[qr % QN]; BARRIER(); qr++;
         if(c.type==1) par[c.a]=c.b<params[c.a].lo?params[c.a].lo:c.b>params[c.a].hi?params[c.a].hi:c.b;
         else if(c.type==0) {
-            start_voice(c.a,c.b,1);
-            if(om_seq_recording)seq_record_hit(c.a,c.b);
-        } else if(c.type==6) {           /* key up: held voices of that key leave their loop and play out */
-            for(j=0;j<FMO_VOICES;j++) if(voices[j].key==c.a) voices[j].held=0;
+            start_voice(bank,c.a,c.b,HOLD_LIVE,0);
+            if(om_seq_recording)seq_record_on(c.a,c.b);
+        } else if(c.type==6) {           /* key up: live voices of that key leave their loop and play out */
+            for(j=0;j<FMO_VOICES;j++) if(voices[j].key==c.a && !voices[j].owner) voices[j].hold=0;
+            seq_record_off(c.a);
         } else if(c.type==2) {
             if(om_seq_playing) {seq_stop();clear_sound();} else seq_start();
         } else if(c.type==3) {
             om_seq_recording=(uint8_t)!om_seq_recording;
             if(om_seq_recording && !om_seq_playing)seq_start();
-        } else if(c.type==4) {
-            seq_stop();seq_erase();clear_sound();
+        } else if(c.type==4) {         /* clear: the selected track */
+            track_init(seq_sel);om_seq_recording=0;
+            for(j=0;j<FMO_VOICES;j++) if(voices[j].owner==seq_sel+1) voices[j].hold=0;
         } else if(c.type==5) om_seq_bpm=(uint16_t)(c.a<40?40:c.a>240?240:c.a);
+        else if(c.type==7) {seq_sel=(uint8_t)c.a;om_seq_step=om_seq_pos[c.a];}
+        else if(c.type==8) seq_track_set(c.a,c.b,c.c);
+        else if(c.type==9) seq_note(c.a,c.b,c.c,c.d&255,c.d>>8);
+        else if(c.type==10) seq_step_set(c.a,c.b,c.c,c.d);
+        else if(c.type==11) {if(c.b<0) track_init((uint32_t)c.a); else for(j=0;j<OM_POLY;j++) pat[c.a].step[c.b].key[j]=0xFF;}
+        else if(c.type==12) seq_fill=(uint8_t)(c.a!=0);
     }
     for(j=0;j<FMO_VOICES;j++) {       /* the bend, once per block; under 1.0 so a frame decodes at most one sample */
         float f=(float)voices[j].inc*bend; inc[j]=f>65535.0f?65535u:(uint32_t)f;
     }
     for(i=0;i<n;i++) {
         float dry=0.0f,wl,wr,delayed,in,l,r; uint32_t off,at,next;
-        if(om_seq_playing && seq_phase>=SEQ_PHASE) {
-            seq_phase-=SEQ_PHASE;om_seq_step=(uint8_t)((om_seq_step+1u)%FMO_STEPS);seq_fire();
-        }
+        if(om_seq_playing) seq_sample();
         rev_mix+=0.002f*((float)par[P_REVERB]*0.01f-rev_mix);
         echo_mix+=0.002f*((float)par[P_DELAY]*0.01f-echo_mix);
         feedback+=0.002f*((float)par[P_FEEDBACK]*0.01f-feedback);
@@ -201,7 +204,8 @@ void om_render(int32_t *out, uint32_t n, uint32_t gain_q12) {
             while(v->n<(int32_t)a+1) adpcm_next(v);
             dry+=(v->s0+(v->s1-v->s0)*(float)(v->pos&0xFFFFu)*(1.0f/65536.0f))*(1.0f/32768.0f)*v->gain*0.32f;
             v->pos+=inc[j];
-            if(v->held && t->le && (v->pos>>16)+1u>=t->le) {   /* sustain: back to ls, decoder state from there */
+            if(v->hold-1u<HOLD_LIVE-1u) v->hold--;   /* a sequenced note's length runs down */
+            if(v->hold && t->le && (v->pos>>16)+1u>=t->le) {   /* sustain: back to ls, decoder state from there */
                 v->pos-=(uint32_t)(t->le-t->ls)<<16;
                 v->n=t->ls-1; v->h1=t->lh1; v->h2=t->lh2; v->s1=(float)t->lh1;
                 v->fo=t->off+t->ls/14u*8u; v->j=(int)(t->ls%14u);
@@ -215,8 +219,7 @@ void om_render(int32_t *out, uint32_t n, uint32_t gain_q12) {
         l=limit(dry+delayed*echo_mix+wl*rev_mix)*master;
         r=limit(dry+delayed*echo_mix+wr*rev_mix)*master;
         out[2*i]=(int32_t)(l*8388607.0f); out[2*i+1]=(int32_t)(r*8388607.0f);
-        if(om_seq_playing)seq_phase+=(uint32_t)om_seq_bpm*4u;
     }
-    for(j=0;j<FMO_VOICES;j++) if(voices[j].active) keys|=1u<<voices[j].key;
-    om_active_keys=keys;
+    for(i=j=0;j<FMO_VOICES;j++) if(voices[j].active) {keys|=1u<<voices[j].key;i++;}
+    om_active_keys=keys; voices_active=(uint8_t)i;
 }

@@ -17,15 +17,20 @@ X0X and Felucca.
 | 27 keys | Play a meow at that key's note. Hold a key to keep it meowing; let go and it finishes. Up to eight overlap; the oldest is cut first. |
 | PRESET | The bank: MEOW, KITTENS, TOMCATS, HUNGRY. The screen names it. |
 | ALGO | Pitch bend, 10 cents a detent, up to 2 semitones either way. It springs back when you let go. |
-| PLAY | Start the loop from step 1, or stop playback and recording and silence everything. |
+| PLAY | Start all four tracks from step 1, or stop playback and recording and silence everything. |
 | REC (tap) | Start recording from step 1 if stopped; during playback, overdub on or off. |
-| REC (hold 1 s) | Clear the loop. |
+| SEL + white key 1-4 | Choose the track (cat) to play and record into, even while recording. PRESET sets that track's bank. |
+| REC (hold 1 s) | Clear the selected track. |
+| FX (hold) | Audio load: CPU now and its peak since FX went down, xruns, voices sounding. |
 | SELECT | Tempo, 40-240 BPM. |
 | KNOB 1 / 2 / 3 / 4 | Reverb, delay level, delay time (80-500 ms), delay repeats (0-70%). |
 | MASTER | Volume. |
 
-One bar of 16 sixteenths, recorded to the nearest step. Each key has its own slot, so a loop remembers pitches.
-Loop steps play each meow once through. The loop is kept in RAM only: switching off clears it.
+Four tracks, each with its own cat (bank), 16 sixteenths long by default. Notes are recorded to the step nearest
+where you heard them (key-to-ear latency taken off), up to four per step, each with its velocity and the length you
+held it, so a held meow plays back sustained. The engine (`firmware/src/dsp/seq.c`, after SLOOP and Felucca) also
+does per-track length (1-64), division and swing, per-step nudge, ratchets, chance, a:b and fill conditions, and
+mute; the panel controls for those are the next step. Patterns are kept in RAM only: switching off clears them.
 
 MIDI in, channel 1: the bank's 27 notes (MEOW: 67-93) play the matching key with velocity; note-off lets it
 finish. Pitch bend covers 2 semitones. CC 120 and 123 stop the loop and silence the sound.

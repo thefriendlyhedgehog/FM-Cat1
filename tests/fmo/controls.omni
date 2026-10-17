@@ -53,3 +53,10 @@ midi b0 7b 00
 wait 20
 expect active 0
 expect dropped 0
+press FX
+wait 300
+shot meter.png
+expect caption_meter 1
+release FX
+wait 20
+expect caption_meter 0

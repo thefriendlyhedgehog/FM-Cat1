@@ -11,12 +11,13 @@ int main(void){
     om_init();om_seq_set_tempo(240);om_seq_toggle_record();run(1);
     for(int step=0;step<16;step++) {
         while(om_seq_step!=step)run(1);
-        for(int k=0;k<11;k++)om_trigger(k,127);run(1);
+        for(int k=0;k<4;k++)om_trigger(k*6,127);run(1);
     }
     om_seq_toggle_record();om_set(P_REVERB,100);om_set(P_DELAY,100);om_set(P_FEEDBACK,70);run(1);
-    for(int step=0;step<16;step++)assert(om_seq_mask[step]==2047u);
+    for(int step=0;step<16;step++)assert(om_seq_keys(0,step)==(1u|1u<<6|1u<<12|1u<<18));
+    for(int t=1;t<OM_TRACKS;t++){for(int i=0;i<16;i++)for(int k=0;k<4;k++)om_seq_note(t,i,k*6+t,127,2);run(1);}
     double sum=0,max=0;unsigned frames=44100u*30u;
     while(frames){unsigned n=frames>256?256:frames;double t=now();run(n);double dt=now()-t;sum+=dt;if(dt>max)max=dt;frames-=n;}
     assert(om_dropped==0 && om_seq_hit_dropped==0);
-    printf("Dense 240 BPM, 11 sounds on every step, full reverb/delay, 30s: PASS; native host render %.3f%% of real time; max block %.3fms (256-frame budget 5.805ms). Not an FM-1 CPU measurement.\n",100*sum/30,1000*max);
+    printf("Dense 240 BPM, 4 tracks x 4-note chords on every step, full reverb/delay, 30s: PASS; native host render %.3f%% of real time; max block %.3fms (256-frame budget 5.805ms). Not an FM-1 CPU measurement.\n",100*sum/30,1000*max);
 }
