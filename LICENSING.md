@@ -1,15 +1,30 @@
+# Cat Piano licensing
+
+Cat Piano is a derivative of Fart Machine One (adamcharleswilsonmusic-code on GitHub), itself a derivative of FoMni,
+licensed GPL-3.0-only. The pitched playback, per-key tuning, manifest importer, pitch tool, cat artwork
+and tests added for Cat Piano use the same licence. Distribute complete corresponding source alongside
+any firmware distribution.
+
+## Audio
+
+The firmware's meows are five CC0 1.0 recordings from OpenGameArt: Kerzoven ("Cat Purr & Meow",
+https://opengameart.org/content/cat-purr-meow), IgnasD ("Meow", https://opengameart.org/content/meow) and
+AntumDeluge ("Kitten Mew", https://opengameart.org/content/kitten-mew). The source files are in
+`samples/cc0-meows/src/`; crops, measured pitches and sources are in `samples/cc0-meows/manifest.json`
+and travel into `firmware/src/dsp/sample_bank.json`. `Meow.wav` is `Meow.ogg` converted with ffmpeg.
+The synthetic test meows made by `tools/import_samples.py --placeholder` are dedicated to the public
+domain under CC0 1.0. Fart Machine One's recordings are not part of Cat Piano.
+
+## Artwork
+
+The cat and its notes were drawn from scratch for Cat Piano; see `docs/ARTWORK-PROVENANCE.md`.
+
 # Fart Machine One licensing
 
-Fart Machine One is a derivative of FoMni, licensed GPL-3.0-only.
-The new playback engine, importer, UI, original firmware-native cartoon artwork and tests use the same licence. The original
-FoMni plate reverb is retained in `firmware/src/dsp/plate.h`. The cartoon and puff were created from scratch in this project; see `docs/ARTWORK-PROVENANCE.md`. Original platform,
-loader, USB, audio and hardware copyright notices remain in place.
-Distribute complete corresponding source alongside any firmware distribution.
-
-The generated TEST 01–04 chirps are temporary original test audio and are dedicated
-to the public domain under CC0 1.0. They are not recordings of farts.
-The current firmware uses eleven user-supplied samples reported by Adam to come from Pixabay as royalty-free sounds. Their individual recording licences and redistribution permission have not been independently verified. See `samples/ATTRIBUTION.md`. The recordings are included as assets for this instrument, with their separate provenance notice.
-The imported header's code licence does not override a recording's licence.
+Fart Machine One is a derivative of FoMni, licensed GPL-3.0-only. Its playback engine, importer, UI and
+tests are the basis of Cat Piano's. The original FoMni plate reverb is retained in
+`firmware/src/dsp/plate.h`. Original platform, loader, USB, audio and hardware copyright notices remain
+in place.
 
 The official AC79 SDK files packaged into the firmware are Apache-2.0; its licence
 is included in `LICENSES/AC79-SDK-LICENSE.txt`. Upstream notices follow.

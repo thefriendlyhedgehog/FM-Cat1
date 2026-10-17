@@ -233,10 +233,10 @@ static void splash(void)
     lcd_fill(0, 0, 240, 240, RGB(250, 244, 232));
     cv_begin(240, 64, RGB(250, 244, 232));
     {
-        int32_t w = text_w(&FONT_L, "FMO");
-        cv_text((240 - w) / 2, 0, &FONT_L, "FMO", RGB(242, 120, 72));
-        w = text_w(&FONT_S, "Fart Machine One");
-        cv_text((240 - w) / 2, 42, &FONT_S, "Fart Machine One", RGB(150, 136, 118));
+        int32_t w = text_w(&FONT_L, "MEOW");
+        cv_text((240 - w) / 2, 0, &FONT_L, "MEOW", RGB(242, 120, 72));
+        w = text_w(&FONT_S, "Cat Piano");
+        cv_text((240 - w) / 2, 42, &FONT_S, "Cat Piano", RGB(150, 136, 118));
     }
     cv_blit(0, 92);
     lcd_sync();

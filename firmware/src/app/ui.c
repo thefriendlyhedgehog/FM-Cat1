@@ -63,10 +63,10 @@ void ui_input_only(void) {
             proj.par[p]=(int16_t)v; om_set(p,v); ui.controls_dirty=1;
         }
     }
-    /* Channel 1, MIDI F3..G5 (53..79). Note-off does not truncate one-shots. */
+    /* MIDI G4..A6 (67..93), the notes the keys are tuned to. Note-off does not truncate one-shots. */
     for(k=0;k<64 && plat_midi_in(&pkt);k++) {
         uint32_t st=(pkt>>8)&255u,note=(pkt>>16)&127u,vel=(pkt>>24)&127u;
-        if(st==0x90 && vel && note>=53 && note<=79) trigger_key((int)note-53,(int)vel);
+        if(st==0x90 && vel && note>=67 && note<=93) trigger_key((int)note-67,(int)vel);
         if(st==0xb0 && (note==120 || note==123)) quiet();
     }
     plat_play_red(om_seq_recording);
@@ -77,9 +77,9 @@ static void draw_scene(uint32_t now) {
     cv_begin(240,120,FMO_PAPER);
     for(i=0;i<FMO_PUFFS;i++) if(ui.puff_mask & (1u<<i)) {
         uint32_t age=now-ui.puff_at[i];
-        cartoon_puff(age,i); if(age<160u) reacting=1;
+        cartoon_note(age,i); if(age<160u) reacting=1;
     }
-    cartoon_man(reacting);
+    cartoon_cat(reacting);
     cv_blit(0,30);
     ui.last_scene=now; ui.scene_dirty=0;
 }
@@ -138,7 +138,7 @@ void ui_frame(void) {
     }
     if(ui.redraw) {
         cv_begin(240,30,FMO_INK);
-        cv_text((240-text_w(&FONT_B,"FART MACHINE ONE"))/2,7,&FONT_B,"FART MACHINE ONE",FMO_PAPER);
+        cv_text((240-text_w(&FONT_B,"CAT PIANO"))/2,7,&FONT_B,"CAT PIANO",FMO_PAPER);
         cv_blit(0,0);
         ui.scene_dirty=ui.caption_dirty=ui.controls_dirty=ui.status_dirty=1; ui.redraw=0;
     }

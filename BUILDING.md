@@ -1,4 +1,4 @@
-# Build Fart Machine One
+# Build Cat Piano
 
 Prebuilt firmware users can follow [INSTALL.md](INSTALL.md) without compiling.
 These source-build steps target macOS or Linux with a C compiler, Git and Python 3.
@@ -29,14 +29,14 @@ results. The build checks the three packaged SDK file hashes against its referen
 ## Build and check
 
 ```sh
-python tools/import_samples.py samples/originals --names samples/display_names.json
+python tools/import_samples.py --manifest samples/cc0-meows/manifest.json
 sh tests/run_tests.sh
 ./build.sh
 ```
 
-Output: `build/fart-machine-one.fwsc` (installable package), `build/omni.bin`
+Output: `build/cat-piano.fwsc` (installable package), `build/omni.bin`
 (application), and `build/loader/ota.bin` (update loader). Builds and tests do not
-contact the FM-1. The default package identity is `FM-1_701`.
+contact the FM-1. The package identity is `FM-1_963`.
 The build checks entry placement, RAM/app capacity and low-level code boundaries.
 The test suite covers sample import, playback, effects, panel/MIDI controls,
 sequencer timing, overdubbing, stop/clear, encoders, USB audio, TRS MIDI and storage.

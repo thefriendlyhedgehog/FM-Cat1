@@ -38,13 +38,13 @@ tap REC
 tap ARP
 wait 50
 expect triggers 3
-midi 90 35 7f
+midi 90 43 7f
 wait 50
 expect triggers 4
-midi 90 35 00
+midi 90 43 00
 wait 10
 expect triggers 4
-midi 91 35 7f
+midi 91 43 7f
 midi 90 20 7f
 wait 10
 expect triggers 4

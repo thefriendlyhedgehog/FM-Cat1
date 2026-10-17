@@ -22,7 +22,7 @@ int main(void) {
     enc_acc[EN_SELECT]=80;run_ms(20);assert(om_seq_bpm==120);
     held_keys=1u<<4;run_ms(20);held_keys=0;run_ms(20);assert(ui.last==4 && !om_seq_playing);
     button(B_REC);
-    min_q[mi_w++%MQ]=0x09u|0x90u<<8|53u<<16|100u<<24;run_ms(20);
+    min_q[mi_w++%MQ]=0x09u|0x90u<<8|67u<<16|100u<<24;run_ms(20);
     assert(om_seq_mask[0]&1u); /* MIDI notes record as well as local keys */
     min_q[mi_w++%MQ]=0x0bu|0xb0u<<8|123u<<16;run_ms(20);
     assert(!om_seq_playing && !om_seq_recording && !om_active_keys);

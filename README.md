@@ -1,195 +1,85 @@
-# Fart Machine One
+# Cat Piano
 
-Turns your M-VAVE FM-1 into a questionable musical instrument. Eleven artisanal
-farts, reverb, delay, and a 16-step sequencer. Finally, a productive use for wind
-instruments.
+A cat piano for the M-VAVE FM-1: each of the 27 keys plays a real cat's meow, tuned to its note from G4 to A6.
+There is also a 16-step loop, reverb and delay. Forked from
+[Fart Machine One](https://github.com/adamcharleswilsonmusic-code/Fart-Machine-One), which is built on FoMni,
+X0X and Felucca.
 
-![Fart Machine One screen](docs/images/screen-playing.png)
+![Cat Piano screen](docs/images/screen-playing.png)
 
-## Install: from download to first fart
-
-You do **not** need to build the firmware. You will need:
-
-- An **M-VAVE FM-1** and a USB cable that carries data.
-- A computer with **Python 3** installed. If needed, get it from
-  [python.org](https://www.python.org/downloads/).
-- The two downloads listed below, from the same release.
-
-This is replacement firmware for the FM-1. Installation replaces its current
-firmware. Keep the USB cable connected until installation and restart finish.
-The supplied package was installed on our FM-1 and its identity verified;
-other computer setups and starting firmware versions have not all been tested.
-
-### 1. Download the firmware and source
-
-Open **Releases** on this repository's GitHub page and open the release you want.
-Under **Assets**, download:
-
-- **fart-machine-one.fwsc** — the ready-to-install firmware.
-- **fart-machine-one-source.zip** — the source, samples and installation tool.
-
-Extract the source ZIP. Find the folder containing `README.md`,
-`requirements-install.txt` and the `tools` folder. Copy `fart-machine-one.fwsc`
-into that same folder. Leave the firmware file as `.fwsc`; do not unzip it.
-
-### 2. Open a terminal in that folder
-
-**macOS:** Open Terminal, type `cd ` (including the space), drag the extracted
-folder from Finder into Terminal, then press Return.
-
-**Windows:** Open the extracted folder in File Explorer, click its address bar,
-type `cmd`, then press Enter. The Windows commands below are for Command Prompt.
-
-**Linux:** Open a terminal in the extracted folder using your file manager, or
-use `cd` to move into it.
-
-### 3. Set up the installer
-
-Run these lines one at a time.
-
-**macOS / Linux:**
-
-```sh
-python3 -m venv .venv
-. .venv/bin/activate
-python -m pip install -r requirements-install.txt
-```
-
-**Windows (Command Prompt):**
-
-```bat
-py -m venv .venv
-.venv\Scripts\activate
-python -m pip install -r requirements-install.txt
-```
-
-Keep this terminal window open for the remaining steps.
-
-### 4. Connect and check your FM-1
-
-Connect the FM-1 by USB. Close your DAW, MIDI utilities and browser tabs that
-might be using its MIDI connection. Then run:
-
-```sh
-python tools/fm1_install.py --info
-```
-
-The installer should report the FM-1's identity and MIDI port. This command
-only checks the connection; it does not install anything.
-
-### 5. Install
-
-```sh
-python tools/fm1_install.py fart-machine-one.fwsc
-```
-
-Read the confirmation prompt, check that it is the intended device, and type
-`y` to continue. Wait for the update and restart to finish. Successful completion
-reports that the FM-1 runs **FM-1_701**. You can run the `--info` command again
-to check.
-
-### 6. Make something regrettable
-
-Start with the volume low and press a key. Tap **REC**, play a few sounds, then
-tap **REC** again to hear the loop without adding notes. Turn the four effect
-knobs to add reverb and delay. Press **PLAY** to stop, or hold **REC** for one
-second to clear the loop.
-
-**Your loop stays in memory only. Turning the FM-1 off clears it.**
-
-### If something goes wrong
-
-| Problem | What to try |
-| --- | --- |
-| Python command not found | Install Python 3, reopen the terminal and return to the source folder. On Windows, use the `py` command shown above. |
-| `requirements-install.txt` or the installer cannot be found | Check that your terminal is in the folder containing this README and `tools`. |
-| Firmware file cannot be found | Put `fart-machine-one.fwsc` beside this README and check its filename. |
-| No FM-1 found | Try a USB data cable and close other apps using MIDI. The error lists the MIDI input names it can see. |
-| Multiple MIDI devices | Add `--port "part of the FM-1 port name"` to the command, using the actual name reported on your computer. |
-| Interrupted update; FM-1 still in update mode | Run the same install command again to finish the update. |
-| Dependency installation fails | Keep the error text and include your operating system and Python version when asking for help. |
-
-The [short installation guide](INSTALL.md) has the compact command sequence.
-For developers, [BUILDING.md](BUILDING.md) explains building from source.
+> **Status:** builds and passes its host tests. It has **not been installed on an FM-1 yet**.
 
 ## Controls
 
-| Control | Behavior |
+| Control | Behaviour |
 | --- | --- |
-| All 27 keys | Play a full one-shot sample immediately, whether stopped, playing or recording. Eleven sounds repeat across the keys. |
-| PLAY | Start the loop from step 1, or stop playback and recording, silence all voices/effect tails and clear puffs. Stopping retains the loop. |
-| REC — tap and release | Start recording from step 1 if stopped. During playback, turn overdubbing on/off without restarting. Turning recording off leaves playback running. |
-| REC — hold 1 second | Clear the whole loop, stop and silence everything. Releasing after a clear does not start recording. Tempo/effects stay unchanged. |
-| SELECT | Tempo, 40–240 BPM, one BPM per detent; starts at 120. |
-| KNOB 1 | Reverb amount. |
-| KNOB 2 | Delay amount. |
-| KNOB 3 | Delay time, 80–500 ms. |
-| KNOB 4 | Delay repeats/feedback, 0–70%. |
+| 27 keys | Play a meow at that key's note, G4 (lowest key) to A6. Up to eight overlap; the oldest is cut first. |
+| PLAY | Start the loop from step 1, or stop playback and recording and silence everything. |
+| REC (tap) | Start recording from step 1 if stopped; during playback, overdub on or off. |
+| REC (hold 1 s) | Clear the loop. |
+| SELECT | Tempo, 40-240 BPM. |
+| KNOB 1 / 2 / 3 / 4 | Reverb, delay level, delay time (80-500 ms), delay repeats (0-70%). |
 | MASTER | Volume. |
 
-One bar of 16 sixteenth-notes. Recording snaps to the nearest step. Different
-sounds can share a step; recording the same sound again on the same step updates
-its velocity rather than duplicating it. Repeated keyboard copies of one sample
-share that stored sound. A live tap is heard immediately; a tap quantized ahead
-joins loop playback on the next circuit, avoiding a second near-immediate echo.
-Eight audio voices are available, with oldest-voice replacement if more overlap.
+One bar of 16 sixteenths, recorded to the nearest step. Each key has its own slot, so a loop remembers pitches.
+The loop is kept in RAM only: switching off clears it.
 
-The bottom line shows STOP / PLAY / REC, tempo and the current step while running.
-The four effect values remain visible while the cartoon and status strip animate. PLAY lights when running, REC
-lights when recording, and PLAY uses its red LED during recording.
+MIDI in, channel 1: notes 67-93 (G4-A6) play the matching key with velocity. Note-off does not cut a meow short.
+CC 120 and 123 stop the loop and silence the sound.
 
-**The one pattern lives in RAM. Power-off/reboot clears it.** No song mode,
-multi-pattern storage, lane editing or synth engines. Musical controls not listed
-above are unused. Hardware calibration, boot recovery and update shortcuts remain.
+## The cats
 
-MIDI channel 1 notes 53–79 play/record the corresponding keys with velocity;
-note-off does not shorten the sample. CC120/123 stop transport and silence sound
-without erasing the loop. MIDI clock sync is not implemented.
+Five CC0 recordings from OpenGameArt, each pitched across a few keys
+(`samples/cc0-meows/manifest.json` has the crops, measured pitches and sources):
 
-## Sounds and names
+| Sound | Recording | Root | Keys |
+| --- | --- | --- | --- |
+| PURRY | [Kerzoven, "Cat Purr & Meow"](https://opengameart.org/content/cat-purr-meow) (cat_mewpurr2) | 445 Hz | G4-C5 |
+| MEOW | [IgnasD, "Meow"](https://opengameart.org/content/meow) | 617 Hz | C#5-E5 |
+| SOFTY | Kerzoven (cat_softmew, first mew) | 729 Hz | F5-G#5 |
+| SQUEAK | Kerzoven (cat_softmew, second mew) | 955 Hz | A5-B5 |
+| KITTEN | [AntumDeluge, "Kitten Mew"](https://opengameart.org/content/kitten-mew) | 1066 Hz | C6-A6 |
 
-In original numeric filename order (1–7 and 9–12): TOOT, TRUMP, PFFT, RASPBERRY,
-WIND, FLATULENCE, BOTTOM BURP, AIR BISCUIT, RIPPER, SBD, LET RIP. The same name
-appears wherever a sample repeats over 27 keys, with no numbered suffixes.
+Each key takes the nearest recording and resamples it to the note. The top keys stretch the kitten up to 1.65x,
+so a higher real mew would make them more natural.
 
-The eleven recordings total 6.312585 seconds and are mono PCM16 at 44.1 kHz.
-Copies and checksums are under `samples/`. The compiled bank is 278,384 bytes of
-mono 22,050 Hz PCM. The sounds are reported to originate from Pixabay and have
-separate audio terms; the code licence does not cover them. See
-[samples/ATTRIBUTION.md](samples/ATTRIBUTION.md).
-
-To reproduce the bank without altering source WAVs:
+## Install
 
 ```sh
-python3 tools/import_samples.py samples/originals --names samples/display_names.json
+python3 -m venv .venv && . .venv/bin/activate
+python -m pip install -r requirements-install.txt
+python tools/fm1_install.py --info                 # finds the FM-1, changes nothing
+python tools/fm1_install.py build/cat-piano.fwsc   # asks before it writes
 ```
 
-Importer accepts 1–27 PCM16 mono/stereo WAVs at 8–192 kHz, converts to 22,050 Hz
-mono, removes DC, limits excessive peaks and applies brief boundary fades.
-Compiled audio budget: 320 KiB, about 7.4 seconds of unique audio; no automatic
-truncation. `--map mapping.json` optionally specifies 27 source basenames;
-`--names names.json` supplies distinct readable display labels up to 20 ASCII
-characters. Names affect metadata only. Tests use a separate generated fixture.
+The package identity is **FM-1_963**. To go back, use the [FM-1 Firmware Hub](https://thefirmwarehub.com) or
+M-VAVE's updater. Holding OCT- while switching on starts the USB rescue. See [INSTALL.md](INSTALL.md).
+Installing firmware is at your own risk.
 
-## Build, test, preview and provenance
+## Build and test
 
-See BUILDING.md. `tests/run_tests.sh` includes sanitized playback/FX/UI/sequencer
-checks and platform tests. Additional actual-bank timing/stress/browser tests and
-screenshots are under `tests/fmo/`; generated results go under `build/`.
+See [BUILDING.md](BUILDING.md): the JieLi toolchain runs in a `linux/amd64` container on macOS.
 
-This GPL-3.0-only fork is based on FoMni commit
-`405ef41aef75f7e70afd6decc01505df07c708e9`, with the Felucca-derived HAL, USB,
-audio, flash/loader and recovery support retained. Original cartoon/puff geometry
-was drawn from scratch in `firmware/src/app/cartoon.h`; no downloaded/copied
-character sprites or existing character reference were used. Inherited code and
-the licensed Terminus font remain credited separately. See LICENSING.md and
-`docs/ARTWORK-PROVENANCE.md`.
+```sh
+sh tests/run_tests.sh      # host tests: pitch of every key, DSP, sequencer, UI, importer, storage, USB
+./build.sh                 # -> build/cat-piano.fwsc
+```
 
-Package identity: **FM-1_701**. See [BUILDING.md](BUILDING.md) for the source build
-and [LICENSING.md](LICENSING.md) for code, audio and third-party notices.
-Native/browser CPU figures are not an FM-1 timing measurement.
+`tests/fmo/demo.omni` renders a listening demo with the host simulator (`sh host/build_host.sh`, then
+`build/host/omni_host tests/fmo/demo.omni build/demo`).
 
+## Your own meows
 
-## Inspiration
+1. Put WAVs (16-bit PCM) next to a manifest like `samples/cc0-meows/manifest.json`: per sound a `file`, an
+   optional `start`/`end` in seconds, a `label`, and `license`, `source` and `author`.
+2. `python3 tools/measure_pitch.py path/to/manifest.json --write` measures each meow's pitch (needs numpy) and
+   stores it as `root_hz`. Check the result by ear; meows glide.
+3. `python3 tools/import_samples.py --manifest path/to/manifest.json` writes the bank, then `./build.sh`.
 
-Fart Machine One was partly inspired by [Tooty Loop](https://cannice.itch.io/tooty-loop), a game-jam project I worked on with my friend Candice (cannice) for the GMTK Game Jam 2025. Candice led the idea and game development, and I contributed the sound work. Big thanks to her for the original spark—go give Tooty Loop a toot!
+The importer refuses a bank that would pitch any key more than an octave up. About 7.4 s of audio fits.
+
+## Licence
+
+GPL-3.0-only, as the firmwares it comes from: give the source to anyone you give the firmware to. The meow
+recordings are CC0 1.0. Credits and third-party notices are in [LICENSING.md](LICENSING.md). M-VAVE and FM-1 are
+trademarks of their owners; this project is not affiliated with them.

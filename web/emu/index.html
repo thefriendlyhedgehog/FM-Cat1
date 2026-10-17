@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Fart Machine One in the browser</title>
-<meta name="description" content="Fart Machine One development emulator: eleven fart samples, an original cartoon puff animation, reverb and delay.">
+<title>Cat Piano in the browser</title>
+<meta name="description" content="Cat Piano development emulator: 27 keys of tuned CC0 cat meows, a meowing cat, reverb and delay.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;600&family=Barlow+Semi+Condensed:wght@600;700&display=swap">
@@ -60,8 +60,8 @@ kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--card); b
 <body>
 <main>
 <header>
-  <h1>Fart Machine One</h1>
-  <p>11 fart samples • 16-step loop • reverb + delay</p>
+  <h1>Cat Piano</h1>
+  <p>27 tuned meows • 16-step loop • reverb + delay</p>
 
 </header>
 
@@ -78,7 +78,7 @@ kbd { font: 600 .85em ui-monospace, Menlo, monospace; background: var(--card); b
   <button id="reset" type="button" title="Reboot preview: clear loop and reset controls">Reset preview</button>
 </div>
 
-<section class="help"><div><h2>Press a key</h2><p>All 27 keys trigger a complete fart sample. Eleven recordings repeat across the keys; up to eight sounds can overlap. Every press makes a little puff.</p></div><div><h2>Four knobs</h2><p>KNOB 1: reverb. KNOB 2: delay level. KNOB 3: delay time. KNOB 4: repeats. MASTER: volume. SELECT: tempo (40–240 BPM).</p></div><div><h2>One simple loop</h2><p>Tap REC to start recording; tap again to finish recording while the loop keeps playing. Tap REC during playback to overdub. PLAY starts/stops from step 1. Hold REC for one second to clear and stop. Sixteen sixteenth-notes, nearest-step recording, multiple sounds per step. Loop stays in memory until power-off.</p></div><div><h2>Same playback code</h2><p>The character and puff were drawn from scratch for this project using simple shapes. This preview runs the actual C playback engine and screen code. It does not emulate USB, updates, or the FM-1’s audio hardware. Nothing is flashed.</p></div></section>
+<section class="help"><div><h2>Press a key</h2><p>Each of the 27 keys plays a cat meow tuned to its note, G4 to A6. Five CC0 recordings are pitched across the keys; up to eight sounds can overlap. Every press makes the cat sing a note.</p></div><div><h2>Four knobs</h2><p>KNOB 1: reverb. KNOB 2: delay level. KNOB 3: delay time. KNOB 4: repeats. MASTER: volume. SELECT: tempo (40–240 BPM).</p></div><div><h2>One simple loop</h2><p>Tap REC to start recording; tap again to finish recording while the loop keeps playing. Tap REC during playback to overdub. PLAY starts/stops from step 1. Hold REC for one second to clear and stop. Sixteen sixteenth-notes, nearest-step recording, multiple sounds per step. Loop stays in memory until power-off.</p></div><div><h2>Same playback code</h2><p>The cat and its notes were drawn from scratch for this project using simple shapes. This preview runs the actual C playback engine and screen code. It does not emulate USB, updates, or the FM-1’s audio hardware. Nothing is flashed.</p></div></section>
 </main>
 
 <script>
@@ -90,7 +90,7 @@ const WHITE_K = [0, 2, 4, 6, 7, 9, 11, 12, 14, 16, 18, 19, 21, 23, 24, 26];
 const BLACK_K = [1, 3, 5, 8, 10, 13, 15, 17, 20, 22, 25];
 const BLACK_AFTER = [0, 1, 2, 4, 5, 7, 8, 9, 11, 12, 14];
 const BODY = "#3a3d42", TRAY = "#26282c", KEY_W = "#d9dadc", KEY_B = "#c9cacd", KNOB = "#1f2124", BTNC = "#2e3135", LABEL = "#e8e8ea";
-const STORE_KEY = "fart-machine-one-emu-store";
+const STORE_KEY = "cat-piano-emu-store";
 
 const svg = document.getElementById("panel");
 function el(tag, attrs, parent = svg) {
@@ -382,7 +382,7 @@ async function switchOn() {
           if (m.fb) drawScreen(m.fb);
           drawLights(m.buttons, m.keys);
           window.omniLast = m;
-          if (m.load !== undefined) cpu.textContent = `Fart Machine One uses ${m.load}% of this computer's time`;
+          if (m.load !== undefined) cpu.textContent = `Cat Piano uses ${m.load}% of this computer's time`;
           if (m.store) saveStore(m.store);
         }
       };

@@ -22,12 +22,12 @@ int main(void) {
     assert(__builtin_popcount(ui.puff_mask)==4);
     run_ms(520);assert(!ui.puff_mask && pixels(30,150)==idle);
     assert(pixels(0,30)==header && pixels(178,240)==controls);
-    min_q[mi_w++%MQ]=0x09u|0x90u<<8|53u<<16|127u<<24;run_ms(30);
+    min_q[mi_w++%MQ]=0x09u|0x90u<<8|67u<<16|127u<<24;run_ms(30);
     assert(ui.puff_count==14 && om_triggers==14 && ui.puff_mask);
     held_btn=1u<<B_PLAY;run_ms(30);held_btn=0;run_ms(30); /* starts the empty loop */
     held_btn=1u<<B_PLAY;run_ms(30);held_btn=0;
     assert(!ui.puff_mask && !om_active_keys);
-    min_q[mi_w++%MQ]=0x09u|0x90u<<8|53u<<16;run_ms(20);assert(ui.puff_count==14);
+    min_q[mi_w++%MQ]=0x09u|0x90u<<8|67u<<16;run_ms(20);assert(ui.puff_count==14);
     /* Animation lifetime survives uint32 millisecond rollover (no long simulation). */
     now_ms=UINT32_MAX-100u;trigger_key(0,127);ui_frame();assert(ui.puff_mask);
     now_ms=100u;ui_frame();assert(ui.puff_mask);

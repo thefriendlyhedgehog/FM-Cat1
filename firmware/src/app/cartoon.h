@@ -1,11 +1,13 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* Original Fart Machine One artwork: integer canvas primitives, no bitmap assets.
- * Coordinates are local to the 240 x 120 scene strip. No DSP, delay or IRQ masking. */
+/* Cat piano artwork: a sitting tabby that meows music notes. Integer canvas primitives, no bitmap assets.
+ * Coordinates are local to the 240 x 120 scene strip. No DSP, delay or IRQ masking.
+ * The FMO_PUFF* names are kept from Fart Machine One: a "puff" is now one floating note. */
 #define FMO_PAPER RGB(251,244,222)
 #define FMO_INK RGB(37,48,62)
-#define FMO_SKIN RGB(247,177,120)
-#define FMO_SHIRT RGB(103,183,145)
-#define FMO_PUFF RGB(187,207,168)
+#define CAT_FUR RGB(240,164,92)
+#define CAT_STRIPE RGB(196,110,52)
+#define CAT_CREAM RGB(253,226,186)
+#define CAT_PINK RGB(238,138,140)
 #define FMO_PUFF_MS 480u
 #define FMO_ANIM_MS 40u
 #define FMO_PUFFS 4u
@@ -25,70 +27,76 @@ static void cartoon_outlined(int x,int y,int rx,int ry,uint16_t fill)
     cartoon_oval(x,y,rx,ry,FMO_INK);
     cartoon_oval(x,y,rx-2,ry-2,fill);
 }
-static void cartoon_puff(uint32_t age,uint32_t variant)
+/* Filled triangle with its apex (ax,ay) above a flat base from (x0,by) to (x1,by). */
+static void cartoon_ear(int ax,int ay,int x0,int x1,int by,uint16_t colour)
 {
-    int phase=(int)(age/FMO_ANIM_MS);
-    int x=100-phase*4, y=84-phase/2+(int)(variant%2u)*4;
-    int r=4+phase;
-    uint16_t ink=phase<7?FMO_PUFF:RGB(221,225,194);
-    /* The cloud separates into softer wisps as it travels left. */
-    if(phase<8) {
-        cartoon_oval(x,y,r+5,r/2+3,ink);
-        cartoon_oval(x-6,y-6,r/2+3,r/2+3,ink);
-        cartoon_oval(x+4,y-7,r/2+2,r/2+2,ink);
-        cartoon_oval(x-4,y+3,r/2+3,r/2+2,ink);
-        cartoon_oval(x-4,y-5,2,2,FMO_PAPER);
-    } else {
-        cartoon_oval(x-8,y-8,5,4,ink);
-        cartoon_oval(x+7,y-4,4,3,ink);
-        cartoon_oval(x,y+6,6,3,ink);
-    }
-    if(phase<3) {
-        cv_line(106,80,111,78,FMO_PUFF);
-        cv_line(106,89,112,90,FMO_PUFF);
+    int y;
+    for(y=ay;y<=by;y++) {
+        int l=ax+(x0-ax)*(y-ay)/(by-ay+1), r=ax+(x1-ax)*(y-ay)/(by-ay+1);
+        cv_rect(l,y,r-l+1,1,colour);
     }
 }
-static void cartoon_man(int reacting)
+/* One note leaves the cat's mouth and drifts up and left, wobbling; odd variants are beamed pairs. */
+static void cartoon_note(uint32_t age,uint32_t variant)
 {
-    int hop=reacting?-2:0;
-    cartoon_oval(139,113,37,4,RGB(225,215,187));
-    /* Stubby legs and shoes behind the round body. */
-    cartoon_outlined(128,101+hop,7,13,FMO_SKIN);
-    cartoon_outlined(152,101+hop,7,13,FMO_SKIN);
-    cartoon_oval(130,111+hop,12,5,FMO_INK);
-    cartoon_oval(156,111+hop,12,5,FMO_INK);
-    /* Head, neck, generously round shirt and shorts. */
-    cartoon_outlined(147,47+hop,9,12,FMO_SKIN);
-    cartoon_outlined(142,74+hop,31,30,FMO_SHIRT);
-    cartoon_oval(141,94+hop,26,10,FMO_INK);
-    cv_rect(118,90+hop,47,9,FMO_INK);
-    cv_line(142,97+hop,142,103+hop,FMO_PAPER);
-    cartoon_oval(146,74+hop,21,17,RGB(123,201,160));
-    /* Short sleeve, hanging arm, tiny hand. */
-    cartoon_outlined(162,72+hop,8,16,FMO_SKIN);
-    cartoon_oval(160,61+hop,10,8,FMO_INK);
-    cartoon_oval(160,60+hop,8,6,FMO_SHIRT);
-    cartoon_oval(164,84+hop,6,6,FMO_SKIN);
-    cv_line(166,84+hop,166,88+hop,RGB(208,129,88));
-    /* Hair silhouette, cheek, ear and nose: facing right, puff behind him. */
-    cartoon_oval(146,27+hop,21,22,FMO_INK);
-    cartoon_outlined(149,32+hop,19,20,FMO_SKIN);
-    cartoon_oval(143,15+hop,16,8,FMO_INK);
-    cartoon_oval(131,25+hop,5,11,FMO_INK);
-    cartoon_outlined(133,35+hop,5,7,FMO_SKIN);
-    cartoon_outlined(168,33+hop,7,5,FMO_SKIN);
-    cartoon_oval(163,39+hop,5,3,RGB(234,137,105));
-    if(reacting) {
-        cv_line(153,27+hop,157,29+hop,FMO_INK);
-        cv_line(157,29+hop,152,31+hop,FMO_INK);
-        cartoon_oval(160,43+hop,3,4,FMO_INK);
+    static const int8_t WOBBLE[8]={0,2,3,2,0,-2,-3,-2};
+    int phase=(int)(age/FMO_ANIM_MS);
+    int x=104-phase*6, y=60-phase*3-(int)(variant%2u)*6+WOBBLE[(phase+(int)variant)&7];
+    uint16_t ink=phase<8?(variant&1u?RGB(124,92,178):RGB(52,140,150)):RGB(196,196,206);
+    cartoon_oval(x,y,4,3,ink);
+    cv_rect(x+3,y-13,2,13,ink);
+    if(variant&1u) {
+        cartoon_oval(x+10,y-2,4,3,ink);
+        cv_rect(x+13,y-15,2,13,ink);
+        cv_rect(x+3,y-15,12,3,ink);
     } else {
-        cartoon_oval(156,28+hop,2,3,FMO_INK);
-        cv_line(153,21+hop,159,22+hop,FMO_INK);
-        cv_line(154,42+hop,158,45+hop,FMO_INK);
-        cv_line(158,45+hop,164,42+hop,FMO_INK);
+        cv_line(x+4,y-13,x+9,y-8,ink);
+        cv_line(x+5,y-13,x+10,y-8,ink);
     }
-    /* A single hair flick makes the silhouette readable at device size. */
-    cv_line(139,8+hop,143,4+hop,FMO_INK);
-    cv_line(143,4+hop,148,8+hop,FMO_INK);
+}
+static void cartoon_cat(int meowing)
+{
+    int h=meowing?-2:0;
+    cartoon_oval(146,113,42,4,RGB(225,215,187));
+    /* Tail curling up behind the right side. */
+    cartoon_outlined(178,104+h,12,7,CAT_FUR);
+    cartoon_outlined(190,92+h,7,10,CAT_FUR);
+    cartoon_outlined(193,78+h,6,8,CAT_FUR);
+    cartoon_oval(194,73+h,4,3,CAT_STRIPE);
+    /* Body, cream chest, side stripes, front paws. */
+    cartoon_outlined(150,88+h,32,25,CAT_FUR);
+    cartoon_oval(140,92+h,15,17,CAT_CREAM);
+    cv_rect(168,76+h,10,3,CAT_STRIPE); cv_rect(170,86+h,9,3,CAT_STRIPE); cv_rect(168,96+h,10,3,CAT_STRIPE);
+    cartoon_outlined(132,110+h,9,5,CAT_CREAM);
+    cartoon_outlined(152,110+h,9,5,CAT_CREAM);
+    cv_line(130,109+h,130,113+h,FMO_INK); cv_line(134,109+h,134,113+h,FMO_INK);
+    cv_line(150,109+h,150,113+h,FMO_INK); cv_line(154,109+h,154,113+h,FMO_INK);
+    /* Ears (outlined, pink inside), then the head over their bases. */
+    cartoon_ear(114,10+h,106,128,40+h,FMO_INK);
+    cartoon_ear(115,15+h,110,125,38+h,CAT_FUR);
+    cartoon_ear(116,21+h,113,121,36+h,CAT_PINK);
+    cartoon_ear(150,10+h,136,158,40+h,FMO_INK);
+    cartoon_ear(149,15+h,139,155,38+h,CAT_FUR);
+    cartoon_ear(148,21+h,143,152,36+h,CAT_PINK);
+    cartoon_outlined(132,50+h,29,24,CAT_FUR);
+    cartoon_oval(132,62+h,13,9,CAT_CREAM);
+    cv_rect(129,28+h,2,9,CAT_STRIPE); cv_rect(124,30+h,2,7,CAT_STRIPE); cv_rect(134,30+h,2,7,CAT_STRIPE);
+    /* Eyes: open and round, or happily squeezed shut mid-meow. */
+    if(meowing) {
+        cv_line(115,48+h,119,44+h,FMO_INK); cv_line(119,44+h,123,48+h,FMO_INK);
+        cv_line(141,48+h,145,44+h,FMO_INK); cv_line(145,44+h,149,48+h,FMO_INK);
+    } else {
+        cartoon_oval(119,47+h,4,5,FMO_INK); cartoon_oval(145,47+h,4,5,FMO_INK);
+        cartoon_oval(120,45+h,1,1,FMO_PAPER); cartoon_oval(146,45+h,1,1,FMO_PAPER);
+    }
+    cartoon_oval(132,56+h,3,2,CAT_PINK);
+    if(meowing) {
+        cartoon_oval(132,65+h,6,6,FMO_INK);
+        cartoon_oval(132,68+h,4,2,CAT_PINK);
+    } else {
+        cv_line(132,58+h,129,62+h,FMO_INK); cv_line(132,58+h,135,62+h,FMO_INK);
+    }
+    /* Whiskers. */
+    cv_line(118,58+h,96,54+h,FMO_INK); cv_line(118,61+h,96,63+h,FMO_INK);
+    cv_line(146,58+h,168,54+h,FMO_INK); cv_line(146,61+h,168,63+h,FMO_INK);
 }

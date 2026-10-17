@@ -26,7 +26,7 @@ for name in encoder uac trs; do
 done
 $CC -O2 tests/storage_test.c -o build/fmo/storage_test
 build/fmo/storage_test
-if [ -f build/fart-machine-one.fwsc ]; then
+if [ -f build/cat-piano.fwsc ]; then
   $CC tests/ota_test.c -o build/fmo/ota_test
-  build/fmo/ota_test build/fart-machine-one.fwsc
+  build/fmo/ota_test build/cat-piano.fwsc
 fi
