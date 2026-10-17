@@ -26,16 +26,16 @@ int main(void) {
     om_init();om_seq_toggle_record();run(1);
     assert(om_seq_playing && om_seq_recording && om_seq_step==0);
     om_trigger(0,127);om_trigger(1,100);om_trigger(11,32);run(1);
-    assert(om_seq_mask[0]==3 && om_triggers==3); /* key 11 repeats sample 0: one stored sound */
+    assert(om_seq_mask[0]==(3u|1u<<11) && om_triggers==3); /* key 11 is its own pitch: its own slot */
     run(3306);om_trigger(2,127);run(1);assert(om_seq_mask[1]==4);
     until_step(1);assert(om_triggers==4); /* quantized-ahead live hit is not doubled */
     om_seq_toggle_record();run(1);assert(!om_seq_recording && om_seq_playing);
-    unsigned before=om_triggers;run(88200);assert(om_triggers==before+3);
-    count=0;while(om_take_seq_hit(&key)){assert(key>=0 && key<=2);count++;}assert(count==3);
+    unsigned before=om_triggers;run(88200);assert(om_triggers==before+4);
+    count=0;while(om_take_seq_hit(&key)){assert((key>=0 && key<=2) || key==11);count++;}assert(count==4);
     om_seq_toggle_play();run(1);assert(!om_seq_playing && !om_seq_recording && !om_active_keys);
-    assert(om_seq_mask[0]==3 && om_seq_mask[1]==4);
+    assert(om_seq_mask[0]==(3u|1u<<11) && om_seq_mask[1]==4);
     before=om_triggers;run(100000);assert(om_triggers==before); /* stopped means no sequenced audio */
-    om_seq_toggle_play();run(1);assert(om_seq_step==0 && om_triggers==before+2);
+    om_seq_toggle_play();run(1);assert(om_seq_step==0 && om_triggers==before+3);
     om_seq_set_tempo(500);run(1);assert(om_seq_bpm==240);
     om_seq_set_tempo(-5);run(1);assert(om_seq_bpm==40);
     om_seq_clear();run(1);assert(!om_seq_playing && !om_seq_recording && om_seq_bpm==40);
@@ -44,5 +44,5 @@ int main(void) {
     om_trigger(7,127);run(1);assert(om_active_keys); /* live keys still work while stopped */
     om_panic();run(1);assert(!om_active_keys && !om_seq_playing);
     om_init();assert(om_seq_bpm==120);for(int i=0;i<16;i++)assert(om_seq_mask[i]==0);
-    puts("SEQ DSP PASS: exact sample-clock timing, 16-step wrap, 137 BPM minute, quantization, overdub/dedup, no doubled live hit, stop/restart, clear, tempo limits, live keys, stale puff cancellation, reboot defaults");
+    puts("SEQ DSP PASS: exact sample-clock timing, 16-step wrap, 137 BPM minute, quantization, overdub, per-key slots, no doubled live hit, stop/restart, clear, tempo limits, live keys, stale puff cancellation, reboot defaults");
 }

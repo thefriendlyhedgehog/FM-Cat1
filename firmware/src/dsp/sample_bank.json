@@ -1,125 +1,296 @@
 {
   "placeholder": false,
   "sample_rate": 22050,
-  "pcm_bytes": 278384,
+  "pcm_bytes": 162754,
   "budget_bytes": 327680,
   "mapping": [
     0,
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
+    0,
+    0,
+    0,
+    0,
     0,
     1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8,
-    9,
-    10,
-    0,
+    1,
+    1,
     1,
     2,
+    2,
+    2,
+    2,
     3,
+    3,
+    3,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
+    4,
     4
+  ],
+  "keys": [
+    {
+      "key": 1,
+      "sample": 0,
+      "note": 67,
+      "inc_q16": 28858,
+      "label": "G4 PURRY"
+    },
+    {
+      "key": 2,
+      "sample": 0,
+      "note": 68,
+      "inc_q16": 30574,
+      "label": "G#4 PURRY"
+    },
+    {
+      "key": 3,
+      "sample": 0,
+      "note": 69,
+      "inc_q16": 32393,
+      "label": "A4 PURRY"
+    },
+    {
+      "key": 4,
+      "sample": 0,
+      "note": 70,
+      "inc_q16": 34319,
+      "label": "A#4 PURRY"
+    },
+    {
+      "key": 5,
+      "sample": 0,
+      "note": 71,
+      "inc_q16": 36359,
+      "label": "B4 PURRY"
+    },
+    {
+      "key": 6,
+      "sample": 0,
+      "note": 72,
+      "inc_q16": 38521,
+      "label": "C5 PURRY"
+    },
+    {
+      "key": 7,
+      "sample": 1,
+      "note": 73,
+      "inc_q16": 29422,
+      "label": "C#5 MEOW"
+    },
+    {
+      "key": 8,
+      "sample": 1,
+      "note": 74,
+      "inc_q16": 31172,
+      "label": "D5 MEOW"
+    },
+    {
+      "key": 9,
+      "sample": 1,
+      "note": 75,
+      "inc_q16": 33026,
+      "label": "D#5 MEOW"
+    },
+    {
+      "key": 10,
+      "sample": 1,
+      "note": 76,
+      "inc_q16": 34989,
+      "label": "E5 MEOW"
+    },
+    {
+      "key": 11,
+      "sample": 2,
+      "note": 77,
+      "inc_q16": 31399,
+      "label": "F5 SOFTY"
+    },
+    {
+      "key": 12,
+      "sample": 2,
+      "note": 78,
+      "inc_q16": 33267,
+      "label": "F#5 SOFTY"
+    },
+    {
+      "key": 13,
+      "sample": 2,
+      "note": 79,
+      "inc_q16": 35245,
+      "label": "G5 SOFTY"
+    },
+    {
+      "key": 14,
+      "sample": 2,
+      "note": 80,
+      "inc_q16": 37340,
+      "label": "G#5 SOFTY"
+    },
+    {
+      "key": 15,
+      "sample": 3,
+      "note": 81,
+      "inc_q16": 30198,
+      "label": "A5 SQUEAK"
+    },
+    {
+      "key": 16,
+      "sample": 3,
+      "note": 82,
+      "inc_q16": 31993,
+      "label": "A#5 SQUEAK"
+    },
+    {
+      "key": 17,
+      "sample": 3,
+      "note": 83,
+      "inc_q16": 33896,
+      "label": "B5 SQUEAK"
+    },
+    {
+      "key": 18,
+      "sample": 4,
+      "note": 84,
+      "inc_q16": 32166,
+      "label": "C6 KITTEN"
+    },
+    {
+      "key": 19,
+      "sample": 4,
+      "note": 85,
+      "inc_q16": 34078,
+      "label": "C#6 KITTEN"
+    },
+    {
+      "key": 20,
+      "sample": 4,
+      "note": 86,
+      "inc_q16": 36105,
+      "label": "D6 KITTEN"
+    },
+    {
+      "key": 21,
+      "sample": 4,
+      "note": 87,
+      "inc_q16": 38252,
+      "label": "D#6 KITTEN"
+    },
+    {
+      "key": 22,
+      "sample": 4,
+      "note": 88,
+      "inc_q16": 40526,
+      "label": "E6 KITTEN"
+    },
+    {
+      "key": 23,
+      "sample": 4,
+      "note": 89,
+      "inc_q16": 42936,
+      "label": "F6 KITTEN"
+    },
+    {
+      "key": 24,
+      "sample": 4,
+      "note": 90,
+      "inc_q16": 45489,
+      "label": "F#6 KITTEN"
+    },
+    {
+      "key": 25,
+      "sample": 4,
+      "note": 91,
+      "inc_q16": 48194,
+      "label": "G6 KITTEN"
+    },
+    {
+      "key": 26,
+      "sample": 4,
+      "note": 92,
+      "inc_q16": 51060,
+      "label": "G#6 KITTEN"
+    },
+    {
+      "key": 27,
+      "sample": 4,
+      "note": 93,
+      "inc_q16": 54096,
+      "label": "A6 KITTEN"
+    }
   ],
   "samples": [
     {
-      "name": "1",
-      "display_name": "TOOT",
-      "frames": 6891,
-      "source_file": "1.wav",
-      "sha256": "04caac54a1e225eca730cadf93761a1db979279b981f462a08950fd17bde6980",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
+      "name": "PURRY",
+      "display_name": "PURRY",
+      "frames": 23152,
+      "root_note": 69.19951172448297,
+      "source_file": "cat_mewpurr2.wav",
+      "sha256": "918a896111936f3f6316d1cc7fd64aa1ef0a31a4162dfcbe02c058758b0f2458",
+      "author": "Kerzoven",
+      "source": "https://opengameart.org/content/cat-purr-meow",
+      "license": "CC0 1.0",
+      "start": 0.2,
+      "end": 1.25,
+      "root_hz": 445.1
     },
     {
-      "name": "2",
-      "display_name": "TRUMP",
-      "frames": 6891,
-      "source_file": "2.wav",
-      "sha256": "a0eb56f46972eba268b063f715483f4034f3c6c5fee3f50d7e06503af00fec47",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
+      "name": "MEOW",
+      "display_name": "MEOW",
+      "frames": 11258,
+      "root_note": 74.86442351043723,
+      "source_file": "Meow.wav",
+      "sha256": "6571372ad77e566e8c36fa1e99852d232239ac8b99b4ca10cb505ac22381810e",
+      "author": "IgnasD",
+      "source": "https://opengameart.org/content/meow",
+      "license": "CC0 1.0",
+      "root_hz": 617.4,
+      "note": "converted from Meow.ogg with ffmpeg (mono, 44.1 kHz, PCM16)"
     },
     {
-      "name": "3",
-      "display_name": "PFFT",
-      "frames": 6891,
-      "source_file": "3.wav",
-      "sha256": "75ed49600cc0226ea3206582f1ddadc2d0e61263d1b7ce9d6b26698b5ce63169",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
+      "name": "SOFTY",
+      "display_name": "SOFTY",
+      "frames": 15876,
+      "root_note": 77.73860852007965,
+      "source_file": "cat_softmew.wav",
+      "sha256": "7de9fed4401b677ccbf072781182857d875093a8e9b5727fc21b38028cfd5a90",
+      "author": "Kerzoven",
+      "source": "https://opengameart.org/content/cat-purr-meow",
+      "license": "CC0 1.0",
+      "start": 0.33,
+      "end": 1.05,
+      "root_hz": 728.9
     },
     {
-      "name": "4",
-      "display_name": "RASPBERRY",
-      "frames": 8269,
-      "source_file": "4.wav",
-      "sha256": "79c341eb932204f81108cb5c911918e1e98e9449ae188aab44a165fc80007d80",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
+      "name": "SQUEAK",
+      "display_name": "SQUEAK",
+      "frames": 10143,
+      "root_note": 82.41415360734067,
+      "source_file": "cat_softmew.wav",
+      "sha256": "7de9fed4401b677ccbf072781182857d875093a8e9b5727fc21b38028cfd5a90",
+      "author": "Kerzoven",
+      "source": "https://opengameart.org/content/cat-purr-meow",
+      "license": "CC0 1.0",
+      "start": 1.32,
+      "end": 1.78,
+      "root_hz": 954.9
     },
     {
-      "name": "5",
-      "display_name": "WIND",
-      "frames": 9647,
-      "source_file": "5.wav",
-      "sha256": "09e4934a218e48ec1b877adf51189ec21c7b7c9247f9dc379de0fa427c474009",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
-    },
-    {
-      "name": "6",
-      "display_name": "FLATULENCE",
-      "frames": 5512,
-      "source_file": "6.wav",
-      "sha256": "14affb1e7f117ef09326cc9b35331180f155e389a823af6a50c4227696579987",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
-    },
-    {
-      "name": "7",
-      "display_name": "BOTTOM BURP",
-      "frames": 6891,
-      "source_file": "7.wav",
-      "sha256": "82ac77efda65390ec8f63ca1b90ddadb44929616e3cdd4b917df4884c97003a3",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
-    },
-    {
-      "name": "9",
-      "display_name": "AIR BISCUIT",
-      "frames": 22050,
-      "source_file": "9.wav",
-      "sha256": "801ac6453850869fbbb688852bf8d03c98bb4559213398f6258b2114f20f1df0",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
-    },
-    {
-      "name": "10",
-      "display_name": "RIPPER",
-      "frames": 22050,
-      "source_file": "10.wav",
-      "sha256": "383869aff4da25eb8ef5bd5aabdae34e38d98340b16026b63caa39f16801f7b1",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
-    },
-    {
-      "name": "11",
-      "display_name": "SBD",
-      "frames": 22050,
-      "source_file": "11.wav",
-      "sha256": "c004095a4b7891cfe2a448077526073dbdfd09368722a901747588b18104c295",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
-    },
-    {
-      "name": "12",
-      "display_name": "LET RIP",
-      "frames": 22050,
-      "source_file": "12.wav",
-      "sha256": "49d1d6d9840abae5720363621863552a565187e2a959b2f7d76f7ca48c9591cd",
-      "license": "USER TO PROVIDE SOURCE/LICENCE"
+      "name": "KITTEN",
+      "display_name": "KITTEN",
+      "frames": 20948,
+      "root_note": 84.32120808159449,
+      "source_file": "kitten_mew-1.wav",
+      "sha256": "b9fd201358a8c9ff119e76a12938c093f9b291aaddc9d5610544a41f150c2dc0",
+      "author": "AntumDeluge",
+      "source": "https://opengameart.org/content/kitten-mew",
+      "license": "CC0 1.0",
+      "end": 0.95,
+      "root_hz": 1066.1
     }
   ]
 }

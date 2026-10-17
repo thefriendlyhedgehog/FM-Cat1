@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-3.0-only */
-/* Fart Machine One: one-shot samples + the retained FoMni plate + simple echo.
+/* Cat piano (from Fart Machine One): one-shot samples, each key tuned by resampling, + the FoMni plate + simple echo.
  * Single producer (UI), single consumer (audio IRQ). All DSP state belongs to render. */
 #include "omni.h"
 #include "fastmath.h"
@@ -17,7 +17,7 @@ static const om_param_t params[P_NPARAMS] = {
     {"REVERB",0,100,15}, {"DELAY",0,100,0}, {"TIME ms",80,500,240}, {"REPEATS",0,70,25}
 };
 const om_param_t *om_param_info(int p) { return p >= 0 && p < P_NPARAMS ? &params[p] : 0; }
-const char *om_sample_name(int k) { return k >= 0 && k < FMO_KEYS ? fmo_samples[fmo_map[k]].name : ""; }
+const char *om_sample_name(int k) { return k >= 0 && k < FMO_KEYS ? fmo_keys[k].name : ""; }
 int om_placeholder(void) { return FMO_PLACEHOLDER; }
 volatile uint32_t om_active_keys, om_triggers, om_dropped;
 #define QN 128u
@@ -27,7 +27,8 @@ static command_t queue[QN];
 static volatile uint32_t qw, qr, panic_pending;
 static int par[P_NPARAMS];
 static float rev_mix, echo_mix, feedback, delay_frames;
-typedef struct { uint32_t frame, half, age; int key, active; float gain; } voice_t;
+/* pos: read position in source frames, Q16; advances by the key's inc_q16 per output frame */
+typedef struct { uint32_t pos, age; int key, active; float gain; } voice_t;
 static voice_t voices[FMO_VOICES];
 static uint32_t age;
 #define ECHO_N 22052u
@@ -72,7 +73,7 @@ static void start_voice(int key,int velocity) {
     uint32_t j;int s=0;
     for(j=0;j<FMO_VOICES;j++) {if(!voices[j].active){s=(int)j;break;}
         if(voices[j].age<voices[s].age)s=(int)j;}
-    voices[s]=(voice_t){0,0,++age,key,1,(float)velocity*(1.0f/127.0f)};om_triggers++;
+    voices[s]=(voice_t){0,++age,key,1,(float)velocity*(1.0f/127.0f)};om_triggers++;
 }
 static void seq_fire(void) {
     int k;uint32_t mask=om_seq_mask[om_seq_step]&~seq_skip[om_seq_step];
@@ -83,14 +84,13 @@ static void seq_start(void) {
     om_seq_step=0;seq_phase=0;om_seq_playing=1;seq_fire();
 }
 static void seq_record_hit(int key,int velocity) {
-    uint32_t step=om_seq_step;int canonical=0;
-    /* Repeated keyboard copies are the same sound, so store one voice per sound. */
-    while(fmo_map[canonical]!=fmo_map[key])canonical++;
+    uint32_t step=om_seq_step;
+    /* Every key is its own pitch, so every key is its own slot. */
     if(seq_phase>=SEQ_PHASE/2u)step=(step+1u)%FMO_STEPS;
-    om_seq_mask[step]|=1u<<canonical;seq_velocity[step][canonical]=(uint8_t)velocity;
+    om_seq_mask[step]|=1u<<key;seq_velocity[step][key]=(uint8_t)velocity;
     /* Live audio already sounded: do not echo a newly quantized-ahead note again
      * at the imminent boundary. It joins playback on the next circuit. */
-    if(step!=om_seq_step)seq_skip[step]|=1u<<canonical;
+    if(step!=om_seq_step)seq_skip[step]|=1u<<key;
 }
 static void post(int type, int a, int b) {
     uint32_t w = qw;
@@ -149,12 +149,12 @@ void om_render(int32_t *out, uint32_t n, uint32_t gain_q12) {
         feedback+=0.002f*((float)par[P_FEEDBACK]*0.01f-feedback);
         delay_frames+=0.0002f*((float)par[P_TIME]*44.1f-delay_frames);
         for(j=0;j<FMO_VOICES;j++) if(voices[j].active) {
-            voice_t *v=&voices[j]; const fmo_sample_t *s=&fmo_samples[fmo_map[v->key]];
-            uint32_t a=v->frame, b=a+1u<s->length?a+1u:a;
-            float x=(float)s->data[a];
-            if(v->half) x=0.5f*(x+(float)s->data[b]);
+            voice_t *v=&voices[j]; const fmo_key_t *k=&fmo_keys[v->key]; const fmo_sample_t *s=&fmo_samples[k->sample];
+            uint32_t a=v->pos>>16, b=a+1u<s->length?a+1u:a;
+            float x0=(float)s->data[a], fr=(float)(v->pos&0xFFFFu)*(1.0f/65536.0f);
+            float x=x0+((float)s->data[b]-x0)*fr;   /* linear interpolation */
             dry+=x*(1.0f/32768.0f)*v->gain*0.32f;
-            v->half^=1u; if(!v->half && ++v->frame>=s->length) v->active=0;
+            v->pos+=k->inc_q16; if((v->pos>>16)>=s->length) v->active=0;
         }
         off=(uint32_t)delay_frames; at=(echo_pos+ECHO_N-off)%ECHO_N; next=(at+ECHO_N-1u)%ECHO_N;
         delayed=echo[at]+(echo[next]-echo[at])*(delay_frames-(float)off);

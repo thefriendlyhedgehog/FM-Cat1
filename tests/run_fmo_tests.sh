@@ -6,6 +6,8 @@ mkdir -p build/fmo build/gen
 python3 tools/import_samples.py --placeholder --output build/gen/fmo_test_bank.h
 CC="${CC:-cc}"
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src/dsp tests/fmo/dsp_test.c firmware/src/dsp/omni.c -o build/fmo/dsp_test
+$CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src/dsp tests/fmo/pitch_test.c firmware/src/dsp/omni.c -lm -o build/fmo/pitch_test
+build/fmo/pitch_test
 build/fmo/dsp_test
 python3 tests/fmo/import_test.py
 FMO_TEST_BANK=1 sh host/build_host.sh
@@ -15,6 +17,8 @@ build/fmo/ui_test
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -Ifirmware/src/dsp tests/fmo/sequencer_test.c firmware/src/dsp/omni.c -o build/fmo/sequencer_test
 build/fmo/sequencer_test
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -DOM_HOST -Ibuild/gen -Ifirmware/src -Ifirmware/src/dsp tests/fmo/sequencer_ui_test.c firmware/src/dsp/omni.c -lm -o build/fmo/sequencer_ui_test
+$CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -DOM_HOST -Ibuild/gen -Ifirmware/src -Ifirmware/src/dsp tests/fmo/names_test.c firmware/src/dsp/omni.c -lm -o build/fmo/names_test
+build/fmo/names_test
 build/fmo/sequencer_ui_test
 for name in encoder uac trs; do
   $CC -O2 -w -Ifirmware/src -Ifirmware/hal "tests/host/${name}_test.c" -lm -o "build/fmo/${name}_test"
