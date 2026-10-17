@@ -6,6 +6,8 @@ mkdir -p build/fmo build/gen
 python3 tools/import_samples.py --placeholder --output build/gen/fmo_test_bank.h
 CC="${CC:-cc}"
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src/dsp tests/fmo/dsp_test.c firmware/src/dsp/omni.c -o build/fmo/dsp_test
+$CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src/dsp tests/fmo/arp_test.c firmware/src/dsp/omni.c -o build/fmo/arp_test
+build/fmo/arp_test
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src/dsp tests/fmo/pitch_test.c firmware/src/dsp/omni.c -lm -o build/fmo/pitch_test
 build/fmo/pitch_test
 build/fmo/dsp_test
@@ -14,6 +16,7 @@ FMO_TEST_BANK=1 sh host/build_host.sh
 build/host/omni_host tests/fmo/play.omni build/fmo
 build/host/omni_host tests/fmo/controls.omni build/fmo
 build/host/omni_host tests/fmo/tracks.omni build/fmo
+build/host/omni_host tests/fmo/arp.omni build/fmo
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Wno-unused-function -Wno-unused-parameter -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src -Ifirmware/src/dsp tests/fmo/ui_test.c firmware/src/dsp/omni.c -lm -o build/fmo/ui_test
 build/fmo/ui_test
 $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror -DOM_HOST -DFMO_SAMPLE_BANK_HEADER=\"fmo_test_bank.h\" -Ibuild/gen -Ifirmware/src/dsp tests/fmo/sequencer_test.c firmware/src/dsp/omni.c -o build/fmo/sequencer_test

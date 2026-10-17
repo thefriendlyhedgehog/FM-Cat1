@@ -9,6 +9,7 @@ static struct {
     uint32_t rec_down_ms,seq_signature,bend_ms,bend_step_ms;
     int bend_knob,bend_midi,bend_sent;
     uint32_t meter_ms;                     /* FX held: the CPU meter, refreshed every 200 ms */
+    uint8_t arp_edited;                    /* a knob turned while ARP was held: its release is not a tap */
     int tempo,status_dirty;
     int last,redraw,scene_dirty,caption_dirty,controls_dirty;
     const char *message; char sub[40];
@@ -43,6 +44,22 @@ static void meter(void) {
     s=put(s,"%  XRUN ");s=put_n(s,plat_xruns());s=put(s,"  V ");put_n(s,(uint32_t)om_voices_active());
     ui.message="AUDIO LOAD (FX)"; ui.deadline=plat_ms()+400u; ui.caption_dirty=1;
 }
+/* ARP held: its settings (the knobs under ARP: K1 RATE, K2 MODE, K3 OCT, K4 GATE, ALGO LATCH) */
+static void arp_show(int on) {
+    const om_arp_t *a=om_arp(); char *s=ui.sub;
+    s=put(s,om_arp_mode_name(a->mode));s=put(s," ");s=put(s,om_div_name(a->rate));s=put(s,"  OCT ");s=put_n(s,a->oct);
+    s=put(s,"  ");s=put_n(s,a->gate);s=put(s,"%");if(a->latch)put(s,"  LATCH");
+    ui.message=on?"ARP ON":"ARP OFF"; ui.deadline=plat_ms()+1400u; ui.caption_dirty=1;
+}
+static void arp_knob(int k,int d) {
+    const om_arp_t *a=om_arp(); int v;
+    if(k==EN_K1) {v=a->rate-d;om_arp_set(OM_A_RATE,v<0?0:v>=OM_NDIV?OM_NDIV-1:v);}   /* clockwise: faster */
+    else if(k==EN_K2) {v=((a->mode+d)%OM_ARP_NMODES+OM_ARP_NMODES)%OM_ARP_NMODES;om_arp_set(OM_A_MODE,v);}
+    else if(k==EN_K3) om_arp_set(OM_A_OCT,a->oct+d);
+    else if(k==EN_K4) om_arp_set(OM_A_GATE,a->gate+d*5);
+    else if(k==EN_ALGO) om_arp_set(OM_A_LATCH,d>0);
+    ui.arp_edited=1;
+}
 static void trigger_key(int k,int velocity) {om_trigger(k,velocity);show_hit(k);}
 static void quiet(void) { om_panic(); ui.puff_mask=0; ui.scene_dirty=1; }
 void ui_input_only(void) {
@@ -62,6 +79,8 @@ void ui_input_only(void) {
         if(ui.rec_held && !ui.rec_cleared)om_seq_toggle_record();
         ui.rec_held=0;
     }
+    if(pressed & (1u<<B_ARP)) {ui.arp_edited=0;arp_show(om_arp()->on);}   /* tap: on / off; hold: its knobs */
+    if((released & (1u<<B_ARP)) && !ui.arp_edited) {int on=!om_arp()->on;om_arp_set(OM_A_ON,on);arp_show(on);ui.status_dirty=1;}
     if(pressed & (1u<<B_FX)) {plat_cpu_peak(1);ui.meter_ms=now-200u;}
     if((buttons & (1u<<B_FX)) && now-ui.meter_ms>=200u) {ui.meter_ms=now;meter();}
     if(released & (1u<<B_FX)) {ui.message=0;ui.caption_dirty=1;}
@@ -76,7 +95,8 @@ void ui_input_only(void) {
     for(k=0;k<NKEYS;k++) if(up & (1u<<k)) om_release(k);
     ui.keys=keys; ui.buttons=buttons;
     for(k=0;k<NE;k++) { int d=plat_enc(k);
-        if(d && k==EN_PRESET) {        /* PRESET: the bank of cats */
+        if(d && (buttons & (1u<<B_ARP)) && (k>=EN_K1 || k==EN_ALGO)) arp_knob(k,d);
+        else if(d && k==EN_PRESET) {        /* PRESET: the bank of cats */
             int b=om_bank()+d,n=om_bank_count();
             b=((b%n)+n)%n; om_set_bank(b); ui_say("BANK",om_bank_name(b)); ui.status_dirty=1;
         } else if(d && k==EN_ALGO) {   /* ALGO: bend, 10 cents a detent, +-2 semitones; it springs back */
@@ -106,7 +126,8 @@ void ui_input_only(void) {
     }
     if(ui.bend_knob+ui.bend_midi!=ui.bend_sent) {ui.bend_sent=ui.bend_knob+ui.bend_midi; om_set_bend(ui.bend_sent);}
     plat_play_red(om_seq_recording);
-    plat_leds((om_seq_playing?(1u<<B_PLAY):0u)|(om_seq_recording?(1u<<B_REC):0u),keys | om_active_keys);
+    if((buttons & (1u<<B_ARP)) && ui.arp_edited) arp_show(om_arp()->on);
+    plat_leds((om_seq_playing?(1u<<B_PLAY):0u)|(om_seq_recording?(1u<<B_REC):0u)|(om_arp()->on?(1u<<B_ARP):0u),keys | om_active_keys);
 }
 static void draw_scene(uint32_t now) {
     uint32_t i; int reacting=0;
@@ -151,6 +172,7 @@ static void draw_status(void) {
     for(i=0;om_bank_name(om_bank())[i];i++)text[n++]=om_bank_name(om_bank())[i];
     text[n++]=' ';
     while(*mode)text[n++]=*mode++;
+    if(om_arp()->on){text[n++]='A';text[n++]='R';text[n++]='P';text[n++]=' ';}
     decimal(om_seq_bpm,number);for(i=0;number[i];i++)text[n++]=number[i];
     text[n++]=' ';text[n++]='B';text[n++]='P';text[n++]='M';
     if(om_seq_playing) {
@@ -172,7 +194,7 @@ void ui_frame(void) {
         ui.puff_mask&=(uint8_t)~(1u<<i); ui.scene_dirty=1;
     }
     {
-        uint32_t sig=((uint32_t)om_seq_selected()<<28)|((uint32_t)om_bank()<<24)|((uint32_t)om_seq_bpm<<16)|((uint32_t)om_seq_step<<2)|((uint32_t)om_seq_playing<<1)|om_seq_recording;
+        uint32_t sig=((uint32_t)om_arp()->on<<30)|((uint32_t)om_seq_selected()<<28)|((uint32_t)om_bank()<<24)|((uint32_t)om_seq_bpm<<16)|((uint32_t)om_seq_step<<2)|((uint32_t)om_seq_playing<<1)|om_seq_recording;
         if(sig!=ui.seq_signature){ui.seq_signature=sig;ui.status_dirty=1;}
     }
     if(ui.redraw) {

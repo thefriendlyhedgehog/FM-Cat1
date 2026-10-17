@@ -59,6 +59,15 @@ void om_seq_erase(int track, int step);        /* a step, or (step < 0) the whol
 void om_seq_set_fill(int on);
 const om_track_t *om_seq_track(int track);     /* read only (main loop: what the ISR plays) */
 uint32_t om_seq_keys(int track, int step);     /* keys on a step, a bit per key */
+/* The arpeggiator (seq.c): with it on, keys and MIDI notes feed it instead of sounding. */
+enum { OM_ARP_UP, OM_ARP_DOWN, OM_ARP_UPDOWN, OM_ARP_DOWNUP, OM_ARP_PLAYED, OM_ARP_RANDOM, OM_ARP_CONVERGE,
+       OM_ARP_DIVERGE, OM_ARP_PINKY, OM_ARP_THUMB, OM_ARP_CHORD, OM_ARP_NMODES };
+enum { OM_A_ON, OM_A_RATE, OM_A_MODE, OM_A_OCT, OM_A_GATE, OM_A_LATCH };
+typedef struct { uint8_t on, rate, mode, oct, gate, latch; } om_arp_t;   /* rate: a DIV; oct 1..3; gate 5..100 % */
+void om_arp_set(int what, int value);
+const om_arp_t *om_arp(void);                  /* read only (main loop) */
+const char *om_div_name(int div);              /* "1/16" */
+const char *om_arp_mode_name(int mode);        /* "UP" */
 int om_take_seq_hit(int *key); /* UI consumes playback hits; never feeds them back into audio */
 extern volatile uint8_t om_seq_playing, om_seq_recording, om_seq_step, om_seq_pos[OM_TRACKS];
 extern volatile uint16_t om_seq_bpm;

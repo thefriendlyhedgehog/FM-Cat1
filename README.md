@@ -22,6 +22,8 @@ X0X and Felucca.
 | SEL + white key 1-4 | Choose the track (cat) to play and record into, even while recording. PRESET sets that track's bank. |
 | REC (hold 1 s) | Clear the selected track. |
 | FX (hold) | Audio load: CPU now and its peak since FX went down, xruns, voices sounding. |
+| ARP (tap) | Arpeggiator on or off (lit when on). With it on, held keys and MIDI notes are played one a step, in time with the tempo, and recorded as heard. |
+| ARP (hold) + knobs | KNOB 1 rate (1/32 to 1/4, triplets too), KNOB 2 mode (UP, DOWN, UP-DN, DN-UP, PLAYED, RANDOM, CONVERGE, DIVERGE, PINKY, THUMB, CHORD), KNOB 3 octaves 1-3, KNOB 4 gate 5-100 %, ALGO latch (right on, left off). |
 | SELECT | Tempo, 40-240 BPM. |
 | KNOB 1 / 2 / 3 / 4 | Reverb, delay level, delay time (80-500 ms), delay repeats (0-70%). |
 | MASTER | Volume. |

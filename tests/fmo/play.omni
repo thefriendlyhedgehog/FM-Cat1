@@ -38,6 +38,11 @@ expect par3 70
 tap SEQ
 tap REC
 tap ARP
+wait 20
+expect arp 1
+tap ARP
+wait 20
+expect arp 0
 wait 50
 expect triggers 3
 midi 90 43 7f

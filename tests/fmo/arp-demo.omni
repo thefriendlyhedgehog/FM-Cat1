@@ -1,0 +1,79 @@
+# Arpeggiator demo (real banks): build/host/omni_host tests/fmo/arp-demo.omni build/demo
+wait 50
+wav catpiano-arp-demo.wav
+tap ARP
+wait 30
+key 0 down
+key 4 down
+key 7 down
+wait 2000
+key 0 up
+key 4 up
+key 7 up
+press ARP
+wait 20
+spin K2 2
+wait 20
+spin K3 1
+wait 20
+release ARP
+wait 20
+key 0 down
+key 5 down
+key 9 down
+wait 2000
+key 0 up
+key 5 up
+key 9 up
+press ARP
+wait 20
+spin K1 1
+wait 20
+spin K2 8
+wait 20
+spin K4 6
+wait 20
+release ARP
+wait 20
+press SEL
+key 4 down
+wait 40
+key 4 up
+release SEL
+wait 20
+key 0 down
+key 4 down
+key 7 down
+wait 2400
+key 0 up
+key 4 up
+key 7 up
+press ARP
+wait 20
+spin K1 -3
+wait 20
+spin K2 -6
+wait 20
+spin K3 -1
+wait 20
+spin K4 -10
+wait 20
+release ARP
+wait 20
+press SEL
+key 2 down
+wait 40
+key 2 up
+release SEL
+wait 20
+key 12 down
+key 7 down
+key 4 down
+key 0 down
+wait 2400
+key 12 up
+key 7 up
+key 4 up
+key 0 up
+wait 1200
+wavstop

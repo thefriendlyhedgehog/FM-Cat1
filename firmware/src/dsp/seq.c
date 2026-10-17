@@ -1,7 +1,7 @@
 /* SPDX-License-Identifier: GPL-3.0-only
  * Copyright (C) 2026 Leo Kuroshita (@kurogedelic), Hügelton Instruments (Felucca: step conditions and chance)
  * Copyright (C) 2026 isod89 and the SLOOP contributors (the shared-clock grid, LEN / DIV / SWING per track,
- * nudge, ratchets, record latency) */
+ * nudge, ratchets, record latency, the arpeggiator's modes and timing) */
 /* Cat Piano's sequencer: four tracks ("cats"), each up to 64 steps of up to four notes. Included by omni.c (one unit:
  * it starts voices directly) and run in the audio ISR, a sample at a time.
  *
@@ -147,9 +147,12 @@ static void seq_sample(void)
 }
 /* a note played live while recording: into the selected track's step nearest to where it was heard (REC_LAT
  * earlier). A step that has not started yet will not play it again this time round: it sounded live. */
-static void seq_record_on(int key, int vel)
+static void seq_record(int key, int vel, uint32_t lat, uint32_t held);
+static void seq_record_on(int key, int vel) { seq_record(key, vel, REC_LAT * om_seq_bpm, 0); }
+/* lat: units the note was heard before now; held: its length in units, 0 = until its key goes up (seq_record_off) */
+static void seq_record(int key, int vel, uint32_t lat, uint32_t held)
 {
-    uint32_t t = seq_sel, abs = trk[t].abs, into = trk[t].into, lat = REC_LAT * om_seq_bpm, i, k;
+    uint32_t t = seq_sel, abs = trk[t].abs, into = trk[t].into, i, k;
     om_step_t *s;
     if (into < lat) {
         if (abs) { abs--; into += step_len(t, abs); }
@@ -165,6 +168,11 @@ static void seq_record_on(int key, int vel)
     if (k == OM_POLY) for (k = 0; k < OM_POLY && s->key[k] < FMO_KEYS; k++) {}
     if (k == OM_POLY) return;          /* four notes there already */
     s->key[k] = (uint8_t)key; s->vel[k] = (uint8_t)vel; s->len[k] = 4;
+    if (held) {
+        uint32_t q = (held * 4u + trk[t].u / 2u) / trk[t].u;
+        s->len[k] = (uint8_t)(q < 1u ? 1u : q > 255u ? 255u : q);
+        return;
+    }
     rec[key].on = 1; rec[key].trk = (uint8_t)t; rec[key].idx = (uint8_t)i; rec[key].slot = (uint8_t)k;
     rec[key].t0 = clk_units; rec[key].u = trk[t].u;
 }
@@ -205,4 +213,100 @@ static void seq_step_set(int t, int i, int what, int v)
     if (what == OM_S_RAT) s->rat = (uint8_t)(v < 1 ? 1 : v > 4 ? 4 : v);
     else if (what == OM_S_COND) s->cond = (uint8_t)(v < 0 || v > OM_COND_NOFILL ? 0 : v);
     else if (what == OM_S_MICRO) s->micro = (int8_t)(v < -32 ? -32 : v > 31 ? 31 : v);
+}
+
+/* ------------------------------------------------------------- arp --- */
+/* The arpeggiator (after SLOOP 2.7.1 seq.c arp_*): with ARP on, keys and MIDI notes go into the held list instead of
+ * sounding, and the arp plays them one a step at its RATE, by MODE, over OCT octaves (12 keys up; past the top key a
+ * note is left out), each held for GATE % of its step. On the transport's grid while playing (a new chord plays at
+ * once unless the grid is under a quarter step away), from the first key while stopped. LATCH keeps the notes when
+ * the keys go up; the next chord replaces them. Its notes are recorded while recording, as heard. */
+static om_arp_t arp_p = {0, 2, OM_ARP_UP, 1, 50, 0};
+static struct { uint8_t key[16], vel[16], n, phys, fresh; uint32_t idx, into, u; } arp;
+const om_arp_t *om_arp(void) { return &arp_p; }
+static void arp_rate(void)
+{
+    arp.u = BEAT_U / DIV_DEN[arp_p.rate % OM_NDIV];
+    arp.into = om_seq_playing ? clk_pos % arp.u : arp.into % arp.u;
+}
+static void arp_add(int key, int vel)
+{
+    uint32_t i;
+    if (arp_p.latch && !arp.phys) arp.n = 0;        /* a new chord replaces the latched one */
+    arp.phys++;
+    for (i = 0; i < arp.n && arp.key[i] != key; i++) {}
+    if (i == arp.n && arp.n < 16u) { arp.key[arp.n] = (uint8_t)key; arp.vel[arp.n++] = (uint8_t)vel; }
+    if (arp.n == 1u && i == 0u) {                   /* the first note of a chord: now (or the grid just ahead) */
+        arp.fresh = 1; arp.idx = 0;
+        if (!om_seq_playing) arp.into = 0;
+    }
+}
+static void arp_remove(int key)
+{
+    uint32_t i, k = 0;
+    if (arp.phys) arp.phys--;
+    if (arp_p.latch) return;
+    for (i = 0; i < arp.n; i++) if (arp.key[i] != key) { arp.key[k] = arp.key[i]; arp.vel[k++] = arp.vel[i]; }
+    arp.n = (uint8_t)k;
+}
+static void arp_play(uint32_t key, uint32_t vel, uint32_t units)
+{
+    start_voice(bank, (int)key, (int)vel, units / om_seq_bpm + 1u, OM_TRACKS + 1);
+    seq_report((int)key);
+    if (om_seq_recording) seq_record((int)key, (int)vel, 0, units);
+}
+static void arp_step(void)
+{
+    uint8_t list[48], vl[48];
+    uint32_t len = 0, n = arp.n, m = arp_p.mode, i, j, o, idx = arp.idx++, cyc, k, units = arp.u / 100u * arp_p.gate;
+    uint8_t sk[16], sv[16];
+    for (i = 0; i < n; i++) { sk[i] = arp.key[i]; sv[i] = arp.vel[i]; }
+    if (m != OM_ARP_PLAYED)                         /* low to high (PLAYED: as pressed) */
+        for (i = 1; i < n; i++)
+            for (j = i; j > 0 && sk[j - 1] > sk[j]; j--) {
+                uint8_t x = sk[j]; sk[j] = sk[j - 1]; sk[j - 1] = x; x = sv[j]; sv[j] = sv[j - 1]; sv[j - 1] = x;
+            }
+    if (m == OM_ARP_CHORD) {                        /* the first four together, an octave up each step through OCT */
+        o = idx % (arp_p.oct ? arp_p.oct : 1u);
+        for (i = 0; i < n && i < OM_POLY; i++) if (sk[i] + 12u * o < FMO_KEYS) arp_play(sk[i] + 12u * o, sv[i], units);
+        return;
+    }
+    for (o = 0; o < arp_p.oct; o++)
+        for (i = 0; i < n; i++) if (sk[i] + 12u * o < FMO_KEYS) { list[len] = (uint8_t)(sk[i] + 12u * o); vl[len++] = sv[i]; }
+    if (!len) return;
+    cyc = len > 1u ? 2u * len - 2u : 1u; k = idx % cyc;
+    switch (m) {                                    /* SLOOP's arp_pick */
+    case OM_ARP_DOWN: k = len - 1u - idx % len; break;
+    case OM_ARP_UPDOWN: k = k < len ? k : cyc - k; break;
+    case OM_ARP_DOWNUP: k = k < len ? len - 1u - k : k - (len - 1u); break;
+    case OM_ARP_RANDOM: rng ^= rng << 13; rng ^= rng >> 17; rng ^= rng << 5; k = rng % len; break;
+    case OM_ARP_CONVERGE: case OM_ARP_DIVERGE:
+        k = idx % len; if (m == OM_ARP_DIVERGE) k = len - 1u - k;
+        k = (k & 1u) ? len - 1u - k / 2u : k / 2u; break;
+    case OM_ARP_PINKY: k = len < 2u ? 0u : (k & 1u) ? len - 1u : k / 2u; break;
+    case OM_ARP_THUMB: k = len < 2u ? 0u : (k & 1u) ? 1u + k / 2u : 0u; break;
+    default: k = idx % len;                         /* UP, PLAYED */
+    }
+    arp_play(list[k], vl[k], units);
+}
+static void arp_sample(void)                    /* before seq_sample: the same clock position */
+{
+    if (!arp_p.on) return;
+    if (arp.fresh && arp.n) {
+        arp.fresh = 0;
+        if (!om_seq_playing || arp.into * 4u < arp.u * 3u) arp_step();
+    }
+    if (om_seq_playing || arp.n) {                  /* as the tracks: due now, then the clock moves */
+        if (arp.into >= arp.u) { arp.into -= arp.u; if (arp.n) arp_step(); }
+        arp.into += om_seq_bpm;
+    }
+}
+static void arp_set(int what, int v)
+{
+    if (what == OM_A_ON) { arp_p.on = (uint8_t)(v != 0); arp.n = arp.phys = 0; }
+    else if (what == OM_A_RATE) { arp_p.rate = (uint8_t)(v < 0 ? 0 : v >= OM_NDIV ? OM_NDIV - 1 : v); arp_rate(); }
+    else if (what == OM_A_MODE) arp_p.mode = (uint8_t)(v < 0 ? 0 : v >= OM_ARP_NMODES ? OM_ARP_NMODES - 1 : v);
+    else if (what == OM_A_OCT) arp_p.oct = (uint8_t)(v < 1 ? 1 : v > 3 ? 3 : v);
+    else if (what == OM_A_GATE) arp_p.gate = (uint8_t)(v < 5 ? 5 : v > 100 ? 100 : v);
+    else if (what == OM_A_LATCH) { arp_p.latch = (uint8_t)(v != 0); if (!arp_p.latch && !arp.phys) arp.n = 0; }
 }

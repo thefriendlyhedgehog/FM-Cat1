@@ -1,0 +1,43 @@
+# The ARP button: a tap turns it on and off; held, the knobs set it and the release is not a tap.
+wait 50
+expect arp 0
+tap ARP
+wait 20
+expect arp 1
+press ARP
+wait 30
+spin K1 1
+wait 30
+spin K2 2
+wait 30
+spin K3 1
+wait 30
+spin K4 -4
+wait 30
+spin ALGO 1
+wait 30
+shot arp.png
+release ARP
+wait 30
+expect arp 1
+expect arp_rate 1
+expect arp_mode 2
+expect arp_oct 2
+expect arp_gate 30
+expect arp_latch 1
+expect par0 15
+key 0 down
+key 4 down
+wait 20
+key 0 up
+key 4 up
+wait 600
+expect triggers >4
+spin ALGO 1
+wait 30
+expect bend 10
+tap ARP
+wait 20
+expect arp 0
+wait 600
+expect active 0

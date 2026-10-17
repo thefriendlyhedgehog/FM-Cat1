@@ -119,7 +119,7 @@ static void seq_stop(void) {
     for(k=0;k<OM_TRACKS;k++)om_seq_pos[k]=0;
     for(k=0;k<FMO_KEYS;k++)rec[k].on=0;
 }
-static void seq_start(void) { seq_reset(); om_seq_playing=1; }
+static void seq_start(void) { seq_reset(); om_seq_playing=1; arp.into=0; arp.fresh=1; }
 static void post4(int type, int a, int b, int c, int d) {
     uint32_t w = qw;
     if (w - qr >= QN) { om_dropped++; return; }
@@ -143,6 +143,12 @@ void om_seq_note(int t, int i, int key, int vel, int len) {
 void om_seq_step_set(int t, int i, int what, int v) { if (t >= 0 && t < OM_TRACKS && i >= 0 && i < OM_STEPS) post4(10,t,i,what,v); }
 void om_seq_erase(int t, int i) { if (t >= 0 && t < OM_TRACKS && i < OM_STEPS) post(11,t,i); }
 void om_seq_set_fill(int on) { post(12,on,0); }
+void om_arp_set(int what, int v) { post(13,what,v); }
+const char *om_div_name(int d) { static const char *const N[OM_NDIV]={"1/32","1/16T","1/16","1/8T","1/8","1/4"}; return d>=0 && d<OM_NDIV ? N[d] : ""; }
+const char *om_arp_mode_name(int m) {
+    static const char *const N[OM_ARP_NMODES]={"UP","DOWN","UP-DN","DN-UP","PLAYED","RANDOM","CONVERGE","DIVERGE","PINKY","THUMB","CHORD"};
+    return m>=0 && m<OM_ARP_NMODES ? N[m] : "";
+}
 void om_panic(void) { panic_pending = 1; }
 static void clear_sound(void) {
     uint32_t i;
@@ -157,21 +163,26 @@ void om_init(void) {
     feedback=(float)par[P_FEEDBACK]*0.01f; delay_frames=(float)par[P_TIME]*44.1f;
     seq_epoch=hit_w=hit_r=om_seq_ticks=om_seq_hit_dropped=0;bank=0;
     om_seq_bpm=120;seq_patterns_init();seq_stop();
+    arp_p=(om_arp_t){0,2,OM_ARP_UP,1,50,0};arp.n=arp.phys=arp.fresh=0;arp.idx=arp.into=0;arp_rate();
     clear_sound();
 }
 static float limit(float x) { return x > 0.98f ? 0.98f : x < -0.98f ? -0.98f : x; }
 void om_render(int32_t *out, uint32_t n, uint32_t gain_q12) {
     uint32_t i,j,keys=0,inc[FMO_VOICES]; float master=(float)(gain_q12 > 4096 ? 4096 : gain_q12)*(1.0f/4096.0f),bend=bend_mul;
-    if(panic_pending) { qr=qw; panic_pending=0; seq_stop(); clear_sound(); }
+    if(panic_pending) { qr=qw; panic_pending=0; seq_stop(); clear_sound(); arp.n=arp.phys=0; }
     while(qr != qw) {
         command_t c; BARRIER(); c=queue[qr % QN]; BARRIER(); qr++;
         if(c.type==1) par[c.a]=c.b<params[c.a].lo?params[c.a].lo:c.b>params[c.a].hi?params[c.a].hi:c.b;
         else if(c.type==0) {
-            start_voice(bank,c.a,c.b,HOLD_LIVE,0);
-            if(om_seq_recording)seq_record_on(c.a,c.b);
+            if(arp_p.on) arp_add(c.a,c.b);   /* the arp plays it */
+            else {
+                start_voice(bank,c.a,c.b,HOLD_LIVE,0);
+                if(om_seq_recording)seq_record_on(c.a,c.b);
+            }
         } else if(c.type==6) {           /* key up: live voices of that key leave their loop and play out */
             for(j=0;j<FMO_VOICES;j++) if(voices[j].key==c.a && !voices[j].owner) voices[j].hold=0;
             seq_record_off(c.a);
+            if(arp_p.on) arp_remove(c.a);
         } else if(c.type==2) {
             if(om_seq_playing) {seq_stop();clear_sound();} else seq_start();
         } else if(c.type==3) {
@@ -187,12 +198,14 @@ void om_render(int32_t *out, uint32_t n, uint32_t gain_q12) {
         else if(c.type==10) seq_step_set(c.a,c.b,c.c,c.d);
         else if(c.type==11) {if(c.b<0) track_init((uint32_t)c.a); else for(j=0;j<OM_POLY;j++) pat[c.a].step[c.b].key[j]=0xFF;}
         else if(c.type==12) seq_fill=(uint8_t)(c.a!=0);
+        else if(c.type==13) arp_set(c.a,c.b);
     }
     for(j=0;j<FMO_VOICES;j++) {       /* the bend, once per block; under 1.0 so a frame decodes at most one sample */
         float f=(float)voices[j].inc*bend; inc[j]=f>65535.0f?65535u:(uint32_t)f;
     }
     for(i=0;i<n;i++) {
         float dry=0.0f,wl,wr,delayed,in,l,r; uint32_t off,at,next;
+        arp_sample();
         if(om_seq_playing) seq_sample();
         rev_mix+=0.002f*((float)par[P_REVERB]*0.01f-rev_mix);
         echo_mix+=0.002f*((float)par[P_DELAY]*0.01f-echo_mix);

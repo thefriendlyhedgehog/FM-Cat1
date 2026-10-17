@@ -354,6 +354,12 @@ static int expect(const char *what, const char *val)
     else if (!strcmp(what,"ticks")) got=(int)om_seq_ticks;
     else if (!strncmp(what,"mask",4) && atoi(what+4)<OM_STEPS) got=(int)om_seq_keys(om_seq_selected(),atoi(what+4));
     else if (!strcmp(what,"track")) got=om_seq_selected();
+    else if (!strcmp(what,"arp")) got=om_arp()->on;
+    else if (!strcmp(what,"arp_rate")) got=om_arp()->rate;
+    else if (!strcmp(what,"arp_mode")) got=om_arp()->mode;
+    else if (!strcmp(what,"arp_oct")) got=om_arp()->oct;
+    else if (!strcmp(what,"arp_gate")) got=om_arp()->gate;
+    else if (!strcmp(what,"arp_latch")) got=om_arp()->latch;
     else if (!strcmp(what,"active")) got=(int)om_active_keys;
     else if (!strcmp(what,"bank")) got=om_bank();
     else if (!strcmp(what,"bend")) got=ui.bend_sent;
