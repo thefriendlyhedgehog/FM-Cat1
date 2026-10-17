@@ -1,19 +1,22 @@
 # Cat Piano
 
-A cat piano for the M-VAVE FM-1: each of the 27 keys plays a real cat's meow, tuned to its note from G4 to A6.
-There is also a 16-step loop, reverb and delay. Forked from
+A cat piano for the M-VAVE FM-1: each of the 27 keys plays a real cat's meow, tuned to its note. Four banks of
+cats, held notes that keep meowing, a pitch-bend knob, a 16-step loop, reverb and delay. Forked from
 [Fart Machine One](https://github.com/adamcharleswilsonmusic-code/Fart-Machine-One), which is built on FoMni,
 X0X and Felucca.
 
 ![Cat Piano screen](docs/images/screen-playing.png)
 
-> **Status:** builds and passes its host tests. It has **not been installed on an FM-1 yet**.
+> **Status:** builds and passes its host tests. The first version (one bank) ran on an FM-1; this version
+> (banks, sustain, bend) has not been installed on one yet.
 
 ## Controls
 
 | Control | Behaviour |
 | --- | --- |
-| 27 keys | Play a meow at that key's note, G4 (lowest key) to A6. Up to eight overlap; the oldest is cut first. |
+| 27 keys | Play a meow at that key's note. Hold a key to keep it meowing; let go and it finishes. Up to eight overlap; the oldest is cut first. |
+| PRESET | The bank: MEOW, KITTENS, TOMCATS, HUNGRY. The screen names it. |
+| ALGO | Pitch bend, 10 cents a detent, up to 2 semitones either way. It springs back when you let go. |
 | PLAY | Start the loop from step 1, or stop playback and recording and silence everything. |
 | REC (tap) | Start recording from step 1 if stopped; during playback, overdub on or off. |
 | REC (hold 1 s) | Clear the loop. |
@@ -22,26 +25,24 @@ X0X and Felucca.
 | MASTER | Volume. |
 
 One bar of 16 sixteenths, recorded to the nearest step. Each key has its own slot, so a loop remembers pitches.
-The loop is kept in RAM only: switching off clears it.
+Loop steps play each meow once through. The loop is kept in RAM only: switching off clears it.
 
-MIDI in, channel 1: notes 67-93 (G4-A6) play the matching key with velocity. Note-off does not cut a meow short.
-CC 120 and 123 stop the loop and silence the sound.
+MIDI in, channel 1: the bank's 27 notes (MEOW: 67-93) play the matching key with velocity; note-off lets it
+finish. Pitch bend covers 2 semitones. CC 120 and 123 stop the loop and silence the sound.
 
 ## The cats
 
-Five CC0 recordings from OpenGameArt, each pitched across a few keys
-(`samples/cc0-meows/manifest.json` has the crops, measured pitches and sources):
+| Bank | Keys | Cats |
+| --- | --- | --- |
+| MEOW | G4-A6 | two takes per note, played in turn: Kerzoven's purry and soft mews, IgnasD's meow, AntumDeluge's kitten, a British Shorthair asking for food, Heismark's impatient cat |
+| KITTENS | C5-D7 | small, high mews: a Greek street cat, Heismark, Kerzoven, the kitten |
+| TOMCATS | G3-A5 | low and long: a Siamese, the British Shorthair, a pleading cat |
+| HUNGRY | D4-E6 | Heismark's impatient and pleading cats |
 
-| Sound | Recording | Root | Keys |
-| --- | --- | --- | --- |
-| PURRY | [Kerzoven, "Cat Purr & Meow"](https://opengameart.org/content/cat-purr-meow) (cat_mewpurr2) | 445 Hz | G4-C5 |
-| MEOW | [IgnasD, "Meow"](https://opengameart.org/content/meow) | 617 Hz | C#5-E5 |
-| SOFTY | Kerzoven (cat_softmew, first mew) | 729 Hz | F5-G#5 |
-| SQUEAK | Kerzoven (cat_softmew, second mew) | 955 Hz | A5-B5 |
-| KITTEN | [AntumDeluge, "Kitten Mew"](https://opengameart.org/content/kitten-mew) | 1066 Hz | C6-A6 |
-
-Each key takes the nearest recording and resamples it to the note. The top keys stretch the kitten up to 1.65x,
-so a higher real mew would make them more natural.
+Each bank has a take every three semitones, pitch-shifted to that note with its formants kept (so a cat sounds
+like the same cat, not a chipmunk), and each key resamples its nearest take by a semitone at most. Takes are
+stored as 22.05 kHz 2nd-order ADPCM (about 4.6 bits a sample, 27-58 dB SNR) with a sustain loop for held keys.
+Sources, crops and licences: `samples/banks.json`, [LICENSING.md](LICENSING.md).
 
 ## Install
 
@@ -61,7 +62,7 @@ Installing firmware is at your own risk.
 See [BUILDING.md](BUILDING.md): the JieLi toolchain runs in a `linux/amd64` container on macOS.
 
 ```sh
-sh tests/run_tests.sh      # host tests: pitch of every key, DSP, sequencer, UI, importer, storage, USB
+sh tests/run_tests.sh      # host tests: pitch of every key, sustain, bend, DSP, codec, sequencer, UI, storage, USB
 ./build.sh                 # -> build/cat-piano.fwsc
 ```
 
@@ -70,16 +71,21 @@ sh tests/run_tests.sh      # host tests: pitch of every key, DSP, sequencer, UI,
 
 ## Your own meows
 
-1. Put WAVs (16-bit PCM) next to a manifest like `samples/cc0-meows/manifest.json`: per sound a `file`, an
-   optional `start`/`end` in seconds, a `label`, and `license`, `source` and `author`.
-2. `python3 tools/measure_pitch.py path/to/manifest.json --write` measures each meow's pitch (needs numpy) and
-   stores it as `root_hz`. Check the result by ear; meows glide.
-3. `python3 tools/import_samples.py --manifest path/to/manifest.json` writes the bank, then `./build.sh`.
+Authoring needs numpy, ffmpeg and the [Rubber Band](https://breakfastquay.com/rubberband/) CLI (`brew install
+rubberband`); the firmware build itself does not.
 
-The importer refuses a bank that would pitch any key more than an octave up. About 7.4 s of audio fits.
+1. Put WAVs (16-bit PCM) under `samples/` and list each sound in `samples/banks.json` under `sources`: its
+   `file`, a `start`/`end` crop in seconds, and `license`, `author` and `source`.
+2. `python3 tools/measure_pitch.py samples/banks.json --write` measures each crop's pitch as `root_hz`. Check
+   it by ear or on a spectrogram: meows glide. Add `"root_checked": "how"` to keep a value you set by hand.
+3. Add the ids to a bank's `pool` (a bank: `name` of up to 10 characters, `note0` its lowest key, optional
+   `takes` per anchor), then `python3 tools/render_banks.py` writes `samples/rendered/`.
+4. `python3 tools/import_samples.py --banks samples/rendered/banks.json` writes the firmware bank, then
+   `./build.sh`. Up to 8 banks and 460 KB of ADPCM (about 36 s of audio) fit.
 
 ## Licence
 
 GPL-3.0-only, as the firmwares it comes from: give the source to anyone you give the firmware to. The meow
-recordings are CC0 1.0. Credits and third-party notices are in [LICENSING.md](LICENSING.md). M-VAVE and FM-1 are
-trademarks of their owners; this project is not affiliated with them.
+recordings are CC0 1.0 or public domain, except one under CC BY 4.0 whose attribution must travel with the
+firmware. Credits and third-party notices are in [LICENSING.md](LICENSING.md). M-VAVE and FM-1 are trademarks
+of their owners; this project is not affiliated with them.

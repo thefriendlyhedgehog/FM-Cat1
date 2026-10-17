@@ -6,7 +6,8 @@ static const uint8_t BLACK_K[11]={1,3,5,8,10,13,15,17,20,22,25};
 static struct {
     uint32_t keys,buttons,deadline,puff_at[FMO_PUFFS],puff_count,last_scene;
     uint8_t puff_mask,next_puff,rec_held,rec_cleared;
-    uint32_t rec_down_ms,seq_signature;
+    uint32_t rec_down_ms,seq_signature,bend_ms,bend_step_ms;
+    int bend_knob,bend_midi,bend_sent;
     int tempo,status_dirty;
     int last,redraw,scene_dirty,caption_dirty,controls_dirty;
     const char *message; char sub[24];
@@ -20,6 +21,7 @@ void ui_init(void) {
     ui.puff_mask=ui.next_puff=0; ui.puff_count=0; ui.last_scene=plat_ms();
     for(i=0;i<FMO_PUFFS;i++) ui.puff_at[i]=0;
     ui.rec_held=ui.rec_cleared=0;ui.tempo=om_seq_bpm;ui.seq_signature=0xffffffffu;ui.status_dirty=1;
+    ui.bend_knob=ui.bend_midi=ui.bend_sent=0;ui.bend_ms=ui.bend_step_ms=0;om_set_bend(0);
     plat_glow(0); plat_play_red(0);
 }
 static void show_hit(int k) {
@@ -34,7 +36,7 @@ static void show_hit(int k) {
 static void trigger_key(int k,int velocity) {om_trigger(k,velocity);show_hit(k);}
 static void quiet(void) { om_panic(); ui.puff_mask=0; ui.scene_dirty=1; }
 void ui_input_only(void) {
-    uint32_t keys=plat_keys(),down=keys & ~ui.keys,buttons=plat_buttons(),pkt; int k;
+    uint32_t keys=plat_keys(),down=keys & ~ui.keys,up=ui.keys & ~keys,buttons=plat_buttons(),pkt,now=plat_ms(); int k;
     uint32_t pressed=buttons & ~ui.buttons, released=ui.buttons & ~buttons;
     while(om_take_seq_hit(&k))show_hit(k);
     if(pressed & (1u<<B_PLAY)) {
@@ -51,9 +53,16 @@ void ui_input_only(void) {
         ui.rec_held=0;
     }
     for(k=0;k<NKEYS;k++) if(down & (1u<<k)) trigger_key(k,127);
+    for(k=0;k<NKEYS;k++) if(up & (1u<<k)) om_release(k);
     ui.keys=keys; ui.buttons=buttons;
     for(k=0;k<NE;k++) { int d=plat_enc(k);
-        if(d && k==EN_SELECT) {
+        if(d && k==EN_PRESET) {        /* PRESET: the bank of cats */
+            int b=om_bank()+d,n=om_bank_count();
+            b=((b%n)+n)%n; om_set_bank(b); ui_say("BANK",om_bank_name(b)); ui.status_dirty=1;
+        } else if(d && k==EN_ALGO) {   /* ALGO: bend, 10 cents a detent, +-2 semitones; it springs back */
+            ui.bend_knob+=d*10; if(ui.bend_knob>200)ui.bend_knob=200; if(ui.bend_knob<-200)ui.bend_knob=-200;
+            ui.bend_ms=now;
+        } else if(d && k==EN_SELECT) {
             ui.tempo+=d;if(ui.tempo<40)ui.tempo=40;if(ui.tempo>240)ui.tempo=240;
             om_seq_set_tempo(ui.tempo);
         } else if(d && k>=EN_K1) {
@@ -63,12 +72,19 @@ void ui_input_only(void) {
             proj.par[p]=(int16_t)v; om_set(p,v); ui.controls_dirty=1;
         }
     }
-    /* MIDI G4..A6 (67..93), the notes the keys are tuned to. Note-off does not truncate one-shots. */
+    /* MIDI channel 1: the bank's 27 notes; note-off ends a sustained meow; pitch bend +-2 semitones. */
     for(k=0;k<64 && plat_midi_in(&pkt);k++) {
-        uint32_t st=(pkt>>8)&255u,note=(pkt>>16)&127u,vel=(pkt>>24)&127u;
-        if(st==0x90 && vel && note>=67 && note<=93) trigger_key((int)note-67,(int)vel);
+        uint32_t st=(pkt>>8)&255u,note=(pkt>>16)&127u,vel=(pkt>>24)&127u; int key=(int)note-om_bank_note0();
+        if(st==0x90 && vel && key>=0 && key<NKEYS) trigger_key(key,(int)vel);
+        if((st==0x80 || (st==0x90 && !vel)) && key>=0 && key<NKEYS) om_release(key);
+        if(st==0xe0) ui.bend_midi=((int)((vel<<7)|note)-8192)*200/8192;
         if(st==0xb0 && (note==120 || note==123)) quiet();
     }
+    /* The ALGO bend eases back to 0 once the knob has rested 120 ms (an eighth every 10 ms). */
+    if(ui.bend_knob && now-ui.bend_ms>=120u && now-ui.bend_step_ms>=10u) {
+        ui.bend_step_ms=now; ui.bend_knob=ui.bend_knob*7/8;
+    }
+    if(ui.bend_knob+ui.bend_midi!=ui.bend_sent) {ui.bend_sent=ui.bend_knob+ui.bend_midi; om_set_bend(ui.bend_sent);}
     plat_play_red(om_seq_recording);
     plat_leds((om_seq_playing?(1u<<B_PLAY):0u)|(om_seq_recording?(1u<<B_REC):0u),keys | om_active_keys);
 }
@@ -111,6 +127,8 @@ static void draw_status(void) {
     char text[40],number[12];int n=0,i;
     const char *mode=om_seq_recording?"REC ":om_seq_playing?"PLAY ":"STOP ";
     if(om_placeholder()){text[n++]='T';text[n++]=' ';}
+    for(i=0;om_bank_name(om_bank())[i];i++)text[n++]=om_bank_name(om_bank())[i];
+    text[n++]=' ';
     while(*mode)text[n++]=*mode++;
     decimal(om_seq_bpm,number);for(i=0;number[i];i++)text[n++]=number[i];
     text[n++]=' ';text[n++]='B';text[n++]='P';text[n++]='M';
@@ -133,7 +151,7 @@ void ui_frame(void) {
         ui.puff_mask&=(uint8_t)~(1u<<i); ui.scene_dirty=1;
     }
     {
-        uint32_t sig=((uint32_t)om_seq_bpm<<16)|((uint32_t)om_seq_step<<2)|((uint32_t)om_seq_playing<<1)|om_seq_recording;
+        uint32_t sig=((uint32_t)om_bank()<<24)|((uint32_t)om_seq_bpm<<16)|((uint32_t)om_seq_step<<2)|((uint32_t)om_seq_playing<<1)|om_seq_recording;
         if(sig!=ui.seq_signature){ui.seq_signature=sig;ui.status_dirty=1;}
     }
     if(ui.redraw) {

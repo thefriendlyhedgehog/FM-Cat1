@@ -352,6 +352,8 @@ static int expect(const char *what, const char *val)
     else if (!strcmp(what,"ticks")) got=(int)om_seq_ticks;
     else if (!strncmp(what,"mask",4) && atoi(what+4)<16) got=(int)om_seq_mask[atoi(what+4)];
     else if (!strcmp(what,"active")) got=(int)om_active_keys;
+    else if (!strcmp(what,"bank")) got=om_bank();
+    else if (!strcmp(what,"bend")) got=ui.bend_sent;
     else if (!strcmp(what,"last")) got=ui.last;
     else if (!strcmp(what,"puffs")) got=(int)ui.puff_count;
     else if (!strcmp(what,"puff_mask")) got=(int)ui.puff_mask;

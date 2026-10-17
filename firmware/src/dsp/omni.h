@@ -9,6 +9,13 @@ const om_param_t *om_param_info(int p);
 void om_init(void);
 void om_set(int p, int value);
 void om_trigger(int key, int velocity);
+void om_release(int key);                  /* key up: a held meow leaves its sustain loop and plays its ending */
+int om_bank_count(void);
+int om_bank(void);
+void om_set_bank(int bank);                /* main loop: new notes come from this bank */
+const char *om_bank_name(int bank);
+int om_bank_note0(void);                   /* MIDI note of key 1 in the current bank */
+void om_set_bend(int cents);               /* main loop: pitch bend for every voice, -1200..1200 cents */
 void om_panic(void);
 void om_render(int32_t *out, uint32_t n, uint32_t gain_q12);
 const char *om_sample_name(int key);

@@ -1,19 +1,35 @@
 # Cat Piano licensing
 
 Cat Piano is a derivative of Fart Machine One (adamcharleswilsonmusic-code on GitHub), itself a derivative of FoMni,
-licensed GPL-3.0-only. The pitched playback, per-key tuning, manifest importer, pitch tool, cat artwork
+licensed GPL-3.0-only. The banks, ADPCM codec, renderer, importer, pitch tool, cat artwork
 and tests added for Cat Piano use the same licence. Distribute complete corresponding source alongside
 any firmware distribution.
 
 ## Audio
 
-The firmware's meows are five CC0 1.0 recordings from OpenGameArt: Kerzoven ("Cat Purr & Meow",
-https://opengameart.org/content/cat-purr-meow), IgnasD ("Meow", https://opengameart.org/content/meow) and
-AntumDeluge ("Kitten Mew", https://opengameart.org/content/kitten-mew). The source files are in
-`samples/cc0-meows/src/`; crops, measured pitches and sources are in `samples/cc0-meows/manifest.json`
-and travel into `firmware/src/dsp/sample_bank.json`. `Meow.wav` is `Meow.ogg` converted with ffmpeg.
-The synthetic test meows made by `tools/import_samples.py --placeholder` are dedicated to the public
-domain under CC0 1.0. Fart Machine One's recordings are not part of Cat Piano.
+The firmware's meows are cut from these recordings (crops, measured pitches and sources are in
+`samples/banks.json`; the banks rendered from them are in `samples/rendered/`, and the list of those used travels
+into `firmware/src/dsp/sample_bank.json`). The rendered takes are pitch-shifted, trimmed and level-matched.
+
+| Recording | Author | Licence |
+| --- | --- | --- |
+| ["Cat Purr & Meow"](https://opengameart.org/content/cat-purr-meow) | Kerzoven | CC0 1.0 |
+| ["Meow"](https://opengameart.org/content/meow) | IgnasD | CC0 1.0 |
+| ["Kitten Mew"](https://opengameart.org/content/kitten-mew) | AntumDeluge | CC0 1.0 |
+| [A cat's meow (2015-11-24)](https://commons.wikimedia.org/wiki/File:2015-11-24.%CE%BD%CE%B9%CE%B1%CE%BF%CF%8D%CF%81%CE%B9%CF%83%CE%BC%CE%B1.%CE%9D%CE%B9%CE%AC%CE%BF%CF%85.noise_reduced.flac) | Tsester | CC0 1.0 |
+| [Meow of a Siamese cat](https://commons.wikimedia.org/wiki/File:Meow_of_a_Siamese_cat_-_freemaster2.wav) | freemaster2 | CC0 1.0 |
+| [Getting Out Impatient](https://commons.wikimedia.org/wiki/File:GettingOutImpatient.ogg), [No Trip](https://commons.wikimedia.org/wiki/File:NoTrip.ogg), [Meow of a pleading cat](https://commons.wikimedia.org/wiki/File:Meow_of_a_pleading_cat.oga) | Heismark | Public domain |
+| [Weibliche Britisch Kurzhaar will Futter (C1277)](https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav) | PantheraLeo1359531 | CC BY 4.0 |
+
+**Attribution (CC BY 4.0):** "Weibliche Britisch Kurzhaar will Futter C1277 MIAUEN" by PantheraLeo1359531,
+https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav, licensed
+CC BY 4.0 (https://creativecommons.org/licenses/by/4.0/); cut, pitch-shifted and re-encoded for Cat Piano.
+Keep this notice with any copy of the firmware or its sample files.
+
+Source files are in `samples/cc0-meows/` and `samples/commons-meows/` (`sources.json` there records each
+Commons file's licence as the Commons API reported it). Some downloaded recordings are not used by any bank.
+The synthetic test meows made by `tools/import_samples.py --placeholder` are dedicated to the public domain under
+CC0 1.0. Fart Machine One's recordings are not part of Cat Piano.
 
 ## Artwork
 

@@ -1,0 +1,55 @@
+wait 50
+expect bank 0
+expect bend 0
+spin PRESET 1
+wait 20
+expect bank 1
+shot bank.png
+spin PRESET 1
+wait 20
+expect bank 0
+spin PRESET -1
+wait 20
+expect bank 1
+spin PRESET 1
+wait 20
+expect bank 0
+spin ALGO 5
+wait 20
+expect bend 50
+spin ALGO 100
+wait 20
+expect bend 200
+wait 1000
+expect bend 0
+spin ALGO -3
+wait 20
+expect bend -30
+wait 1000
+expect bend 0
+midi e0 00 60
+wait 10
+expect bend 100
+midi e0 00 40
+wait 10
+expect bend 0
+midi 90 43 7f
+wait 600
+expect active 1
+midi 80 43 00
+wait 400
+expect active 0
+midi 90 43 7f
+wait 300
+midi 90 43 00
+wait 400
+expect active 0
+spin PRESET 1
+wait 20
+midi 90 37 7f
+wait 600
+expect active 1
+midi b0 7b 00
+wait 20
+expect active 0
+expect dropped 0

@@ -1,296 +1,423 @@
 {
-  "placeholder": false,
-  "sample_rate": 22050,
-  "pcm_bytes": 162754,
-  "budget_bytes": 327680,
-  "mapping": [
-    0,
-    0,
-    0,
-    0,
-    0,
-    0,
-    1,
-    1,
-    1,
-    1,
-    2,
-    2,
-    2,
-    2,
-    3,
-    3,
-    3,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4,
-    4
-  ],
-  "keys": [
+ "placeholder": false,
+ "sample_rate": 22050,
+ "adpcm_bytes": 421808,
+ "budget_bytes": 471040,
+ "seconds": 33.46,
+ "sources": [
+  {
+   "id": "greek",
+   "file": "commons-meows/src/greek_cat.wav",
+   "start": 0.12,
+   "end": 0.97,
+   "author": "Tsester",
+   "source": "https://commons.wikimedia.org/wiki/File:2015-11-24.\u03bd\u03b9\u03b1\u03bf\u03cd\u03c1\u03b9\u03c3\u03bc\u03b1.\u039d\u03b9\u03ac\u03bf\u03c5.noise_reduced.flac",
+   "license": "CC0",
+   "root_hz": 618.2
+  },
+  {
+   "id": "imp5",
+   "file": "commons-meows/src/impatient.wav",
+   "start": 7.87,
+   "end": 9.31,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:GettingOutImpatient.ogg",
+   "license": "Public domain",
+   "root_hz": 541.7
+  },
+  {
+   "id": "kitten",
+   "file": "cc0-meows/src/kitten_mew-1.wav",
+   "author": "AntumDeluge",
+   "source": "https://opengameart.org/content/kitten-mew",
+   "license": "CC0 1.0",
+   "end": 0.95,
+   "root_hz": 1066.6
+  },
+  {
+   "id": "meow",
+   "file": "cc0-meows/src/Meow.wav",
+   "author": "IgnasD",
+   "source": "https://opengameart.org/content/meow",
+   "license": "CC0 1.0",
+   "root_hz": 582.9
+  },
+  {
+   "id": "nt1",
+   "file": "commons-meows/src/notrip.wav",
+   "start": 0.49,
+   "end": 1.19,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:NoTrip.ogg",
+   "license": "Public domain",
+   "root_hz": 589.0
+  },
+  {
+   "id": "nt2",
+   "file": "commons-meows/src/notrip.wav",
+   "start": 2.66,
+   "end": 3.27,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:NoTrip.ogg",
+   "license": "Public domain",
+   "root_hz": 644.5
+  },
+  {
+   "id": "nthi",
+   "file": "commons-meows/src/notrip.wav",
+   "start": 7.56,
+   "end": 8.04,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:NoTrip.ogg",
+   "license": "Public domain",
+   "root_hz": 625.7
+  },
+  {
+   "id": "pl1",
+   "file": "commons-meows/src/pleading.wav",
+   "start": 0.25,
+   "end": 1.2,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:Meow_of_a_pleading_cat.oga",
+   "license": "Public domain",
+   "root_hz": 622.8
+  },
+  {
+   "id": "pl4",
+   "file": "commons-meows/src/pleading.wav",
+   "start": 9.39,
+   "end": 10.14,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:Meow_of_a_pleading_cat.oga",
+   "license": "Public domain",
+   "root_hz": 545.9
+  },
+  {
+   "id": "purry",
+   "file": "cc0-meows/src/cat_mewpurr2.wav",
+   "author": "Kerzoven",
+   "source": "https://opengameart.org/content/cat-purr-meow",
+   "license": "CC0 1.0",
+   "start": 0.2,
+   "end": 1.25,
+   "root_hz": 445.0,
+   "root_checked": "spectrogram: harmonics ~445, 890, 1335 Hz"
+  },
+  {
+   "id": "shhi1",
+   "file": "commons-meows/src/shorthair_food.wav",
+   "start": 0.32,
+   "end": 1.44,
+   "author": "PantheraLeo1359531",
+   "source": "https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav",
+   "license": "CC BY 4.0",
+   "root_hz": 453.8
+  },
+  {
+   "id": "shhi2",
+   "file": "commons-meows/src/shorthair_food.wav",
+   "start": 2.27,
+   "end": 3.88,
+   "author": "PantheraLeo1359531",
+   "source": "https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav",
+   "license": "CC BY 4.0",
+   "root_hz": 344.8
+  },
+  {
+   "id": "shlo1",
+   "file": "commons-meows/src/shorthair_food.wav",
+   "start": 5.12,
+   "end": 6.41,
+   "author": "PantheraLeo1359531",
+   "source": "https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav",
+   "license": "CC BY 4.0",
+   "root_hz": 308.4
+  },
+  {
+   "id": "siamese",
+   "file": "commons-meows/src/siamese.wav",
+   "start": 0.14,
+   "end": 1.09,
+   "author": "freemaster2",
+   "source": "https://commons.wikimedia.org/wiki/File:Meow_of_a_Siamese_cat_-_freemaster2.wav",
+   "license": "CC0",
+   "root_hz": 244.5
+  },
+  {
+   "id": "softy",
+   "file": "cc0-meows/src/cat_softmew.wav",
+   "author": "Kerzoven",
+   "source": "https://opengameart.org/content/cat-purr-meow",
+   "license": "CC0 1.0",
+   "start": 0.33,
+   "end": 1.05,
+   "root_hz": 725.0,
+   "root_checked": "spectrogram: harmonics ~730, 1450, 2150 Hz"
+  },
+  {
+   "id": "squeak",
+   "file": "cc0-meows/src/cat_softmew.wav",
+   "author": "Kerzoven",
+   "source": "https://opengameart.org/content/cat-purr-meow",
+   "license": "CC0 1.0",
+   "start": 1.32,
+   "end": 1.78,
+   "root_hz": 954.9
+  }
+ ],
+ "banks": [
+  {
+   "name": "MEOW",
+   "note0": 67,
+   "keys": "G4-A6",
+   "anchors": [
     {
-      "key": 1,
-      "sample": 0,
-      "note": 67,
-      "inc_q16": 28858,
-      "label": "G4 PURRY"
+     "note": "G#4",
+     "takes": [
+      "purry",
+      "shhi1"
+     ]
     },
     {
-      "key": 2,
-      "sample": 0,
-      "note": 68,
-      "inc_q16": 30574,
-      "label": "G#4 PURRY"
+     "note": "B4",
+     "takes": [
+      "shhi1",
+      "imp5"
+     ]
     },
     {
-      "key": 3,
-      "sample": 0,
-      "note": 69,
-      "inc_q16": 32393,
-      "label": "A4 PURRY"
+     "note": "D5",
+     "takes": [
+      "nt1",
+      "meow"
+     ]
     },
     {
-      "key": 4,
-      "sample": 0,
-      "note": 70,
-      "inc_q16": 34319,
-      "label": "A#4 PURRY"
+     "note": "F5",
+     "takes": [
+      "softy",
+      "nt2"
+     ]
     },
     {
-      "key": 5,
-      "sample": 0,
-      "note": 71,
-      "inc_q16": 36359,
-      "label": "B4 PURRY"
+     "note": "G#5",
+     "takes": [
+      "softy",
+      "squeak"
+     ]
     },
     {
-      "key": 6,
-      "sample": 0,
-      "note": 72,
-      "inc_q16": 38521,
-      "label": "C5 PURRY"
+     "note": "B5",
+     "takes": [
+      "squeak",
+      "kitten"
+     ]
     },
     {
-      "key": 7,
-      "sample": 1,
-      "note": 73,
-      "inc_q16": 29422,
-      "label": "C#5 MEOW"
+     "note": "D6",
+     "takes": [
+      "kitten",
+      "squeak"
+     ]
     },
     {
-      "key": 8,
-      "sample": 1,
-      "note": 74,
-      "inc_q16": 31172,
-      "label": "D5 MEOW"
+     "note": "F6",
+     "takes": [
+      "kitten",
+      "squeak"
+     ]
     },
     {
-      "key": 9,
-      "sample": 1,
-      "note": 75,
-      "inc_q16": 33026,
-      "label": "D#5 MEOW"
-    },
-    {
-      "key": 10,
-      "sample": 1,
-      "note": 76,
-      "inc_q16": 34989,
-      "label": "E5 MEOW"
-    },
-    {
-      "key": 11,
-      "sample": 2,
-      "note": 77,
-      "inc_q16": 31399,
-      "label": "F5 SOFTY"
-    },
-    {
-      "key": 12,
-      "sample": 2,
-      "note": 78,
-      "inc_q16": 33267,
-      "label": "F#5 SOFTY"
-    },
-    {
-      "key": 13,
-      "sample": 2,
-      "note": 79,
-      "inc_q16": 35245,
-      "label": "G5 SOFTY"
-    },
-    {
-      "key": 14,
-      "sample": 2,
-      "note": 80,
-      "inc_q16": 37340,
-      "label": "G#5 SOFTY"
-    },
-    {
-      "key": 15,
-      "sample": 3,
-      "note": 81,
-      "inc_q16": 30198,
-      "label": "A5 SQUEAK"
-    },
-    {
-      "key": 16,
-      "sample": 3,
-      "note": 82,
-      "inc_q16": 31993,
-      "label": "A#5 SQUEAK"
-    },
-    {
-      "key": 17,
-      "sample": 3,
-      "note": 83,
-      "inc_q16": 33896,
-      "label": "B5 SQUEAK"
-    },
-    {
-      "key": 18,
-      "sample": 4,
-      "note": 84,
-      "inc_q16": 32166,
-      "label": "C6 KITTEN"
-    },
-    {
-      "key": 19,
-      "sample": 4,
-      "note": 85,
-      "inc_q16": 34078,
-      "label": "C#6 KITTEN"
-    },
-    {
-      "key": 20,
-      "sample": 4,
-      "note": 86,
-      "inc_q16": 36105,
-      "label": "D6 KITTEN"
-    },
-    {
-      "key": 21,
-      "sample": 4,
-      "note": 87,
-      "inc_q16": 38252,
-      "label": "D#6 KITTEN"
-    },
-    {
-      "key": 22,
-      "sample": 4,
-      "note": 88,
-      "inc_q16": 40526,
-      "label": "E6 KITTEN"
-    },
-    {
-      "key": 23,
-      "sample": 4,
-      "note": 89,
-      "inc_q16": 42936,
-      "label": "F6 KITTEN"
-    },
-    {
-      "key": 24,
-      "sample": 4,
-      "note": 90,
-      "inc_q16": 45489,
-      "label": "F#6 KITTEN"
-    },
-    {
-      "key": 25,
-      "sample": 4,
-      "note": 91,
-      "inc_q16": 48194,
-      "label": "G6 KITTEN"
-    },
-    {
-      "key": 26,
-      "sample": 4,
-      "note": 92,
-      "inc_q16": 51060,
-      "label": "G#6 KITTEN"
-    },
-    {
-      "key": 27,
-      "sample": 4,
-      "note": 93,
-      "inc_q16": 54096,
-      "label": "A6 KITTEN"
+     "note": "G#6",
+     "takes": [
+      "kitten",
+      "squeak"
+     ]
     }
-  ],
-  "samples": [
+   ]
+  },
+  {
+   "name": "KITTENS",
+   "note0": 72,
+   "keys": "C5-D7",
+   "anchors": [
     {
-      "name": "PURRY",
-      "display_name": "PURRY",
-      "frames": 23152,
-      "root_note": 69.19951172448297,
-      "source_file": "cat_mewpurr2.wav",
-      "sha256": "918a896111936f3f6316d1cc7fd64aa1ef0a31a4162dfcbe02c058758b0f2458",
-      "author": "Kerzoven",
-      "source": "https://opengameart.org/content/cat-purr-meow",
-      "license": "CC0 1.0",
-      "start": 0.2,
-      "end": 1.25,
-      "root_hz": 445.1
+     "note": "C#5",
+     "takes": [
+      "greek"
+     ]
     },
     {
-      "name": "MEOW",
-      "display_name": "MEOW",
-      "frames": 11258,
-      "root_note": 74.86442351043723,
-      "source_file": "Meow.wav",
-      "sha256": "6571372ad77e566e8c36fa1e99852d232239ac8b99b4ca10cb505ac22381810e",
-      "author": "IgnasD",
-      "source": "https://opengameart.org/content/meow",
-      "license": "CC0 1.0",
-      "root_hz": 617.4,
-      "note": "converted from Meow.ogg with ffmpeg (mono, 44.1 kHz, PCM16)"
+     "note": "E5",
+     "takes": [
+      "nthi"
+     ]
     },
     {
-      "name": "SOFTY",
-      "display_name": "SOFTY",
-      "frames": 15876,
-      "root_note": 77.73860852007965,
-      "source_file": "cat_softmew.wav",
-      "sha256": "7de9fed4401b677ccbf072781182857d875093a8e9b5727fc21b38028cfd5a90",
-      "author": "Kerzoven",
-      "source": "https://opengameart.org/content/cat-purr-meow",
-      "license": "CC0 1.0",
-      "start": 0.33,
-      "end": 1.05,
-      "root_hz": 728.9
+     "note": "G5",
+     "takes": [
+      "softy"
+     ]
     },
     {
-      "name": "SQUEAK",
-      "display_name": "SQUEAK",
-      "frames": 10143,
-      "root_note": 82.41415360734067,
-      "source_file": "cat_softmew.wav",
-      "sha256": "7de9fed4401b677ccbf072781182857d875093a8e9b5727fc21b38028cfd5a90",
-      "author": "Kerzoven",
-      "source": "https://opengameart.org/content/cat-purr-meow",
-      "license": "CC0 1.0",
-      "start": 1.32,
-      "end": 1.78,
-      "root_hz": 954.9
+     "note": "A#5",
+     "takes": [
+      "squeak"
+     ]
     },
     {
-      "name": "KITTEN",
-      "display_name": "KITTEN",
-      "frames": 20948,
-      "root_note": 84.32120808159449,
-      "source_file": "kitten_mew-1.wav",
-      "sha256": "b9fd201358a8c9ff119e76a12938c093f9b291aaddc9d5610544a41f150c2dc0",
-      "author": "AntumDeluge",
-      "source": "https://opengameart.org/content/kitten-mew",
-      "license": "CC0 1.0",
-      "end": 0.95,
-      "root_hz": 1066.1
+     "note": "C#6",
+     "takes": [
+      "kitten"
+     ]
+    },
+    {
+     "note": "E6",
+     "takes": [
+      "kitten"
+     ]
+    },
+    {
+     "note": "G6",
+     "takes": [
+      "kitten"
+     ]
+    },
+    {
+     "note": "A#6",
+     "takes": [
+      "kitten"
+     ]
+    },
+    {
+     "note": "C#7",
+     "takes": [
+      "kitten"
+     ]
     }
-  ]
+   ]
+  },
+  {
+   "name": "TOMCATS",
+   "note0": 55,
+   "keys": "G3-A5",
+   "anchors": [
+    {
+     "note": "G#3",
+     "takes": [
+      "siamese"
+     ]
+    },
+    {
+     "note": "B3",
+     "takes": [
+      "siamese"
+     ]
+    },
+    {
+     "note": "D4",
+     "takes": [
+      "shlo1"
+     ]
+    },
+    {
+     "note": "F4",
+     "takes": [
+      "shhi2"
+     ]
+    },
+    {
+     "note": "G#4",
+     "takes": [
+      "purry"
+     ]
+    },
+    {
+     "note": "B4",
+     "takes": [
+      "shhi1"
+     ]
+    },
+    {
+     "note": "D5",
+     "takes": [
+      "pl4"
+     ]
+    },
+    {
+     "note": "F5",
+     "takes": [
+      "pl4"
+     ]
+    },
+    {
+     "note": "G#5",
+     "takes": [
+      "pl4"
+     ]
+    }
+   ]
+  },
+  {
+   "name": "HUNGRY",
+   "note0": 62,
+   "keys": "D4-E6",
+   "anchors": [
+    {
+     "note": "D#4",
+     "takes": [
+      "imp5"
+     ]
+    },
+    {
+     "note": "F#4",
+     "takes": [
+      "imp5"
+     ]
+    },
+    {
+     "note": "A4",
+     "takes": [
+      "imp5"
+     ]
+    },
+    {
+     "note": "C5",
+     "takes": [
+      "imp5"
+     ]
+    },
+    {
+     "note": "D#5",
+     "takes": [
+      "pl1"
+     ]
+    },
+    {
+     "note": "F#5",
+     "takes": [
+      "nt2"
+     ]
+    },
+    {
+     "note": "A5",
+     "takes": [
+      "nt2"
+     ]
+    },
+    {
+     "note": "C6",
+     "takes": [
+      "nt2"
+     ]
+    },
+    {
+     "note": "D#6",
+     "takes": [
+      "nt2"
+     ]
+    }
+   ]
+  }
+ ]
 }

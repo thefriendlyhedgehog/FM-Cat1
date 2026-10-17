@@ -29,7 +29,7 @@ results. The build checks the three packaged SDK file hashes against its referen
 ## Build and check
 
 ```sh
-python tools/import_samples.py --manifest samples/cc0-meows/manifest.json
+python tools/import_samples.py --banks samples/rendered/banks.json   # only after changing samples/rendered/
 sh tests/run_tests.sh
 ./build.sh
 ```

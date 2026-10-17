@@ -1,0 +1,838 @@
+{
+ "sample_rate": 22050,
+ "banks": [
+  {
+   "name": "MEOW",
+   "note0": 67,
+   "anchors": [
+    {
+     "note": 68,
+     "takes": [
+      {
+       "file": "meow/68-0.wav",
+       "source": "purry",
+       "shift": -1.2,
+       "frames": 23153,
+       "loop": [
+        9528,
+        11337
+       ],
+       "loop_score": 0.871
+      },
+      {
+       "file": "meow/68-1.wav",
+       "source": "shhi1",
+       "shift": -1.53,
+       "frames": 22627,
+       "loop": [
+        8186,
+        10180
+       ],
+       "loop_score": 0.882
+      }
+     ]
+    },
+    {
+     "note": 71,
+     "takes": [
+      {
+       "file": "meow/71-0.wav",
+       "source": "shhi1",
+       "shift": 1.47,
+       "frames": 22869,
+       "loop": [
+        12207,
+        13684
+       ],
+       "loop_score": 0.962
+      },
+      {
+       "file": "meow/71-1.wav",
+       "source": "imp5",
+       "shift": -1.6,
+       "frames": 24255,
+       "loop": [
+        14203,
+        15981
+       ],
+       "loop_score": 0.861
+      }
+     ]
+    },
+    {
+     "note": 74,
+     "takes": [
+      {
+       "file": "meow/74-0.wav",
+       "source": "nt1",
+       "shift": -0.05,
+       "frames": 15356,
+       "loop": [
+        5379,
+        6809
+       ],
+       "loop_score": 0.933
+      },
+      {
+       "file": "meow/74-1.wav",
+       "source": "meow",
+       "shift": 0.13,
+       "frames": 9579,
+       "loop": null,
+       "loop_score": 0.697
+      }
+     ]
+    },
+    {
+     "note": 77,
+     "takes": [
+      {
+       "file": "meow/77-0.wav",
+       "source": "softy",
+       "shift": -0.65,
+       "frames": 15867,
+       "loop": [
+        6936,
+        12341
+       ],
+       "loop_score": 0.969
+      },
+      {
+       "file": "meow/77-1.wav",
+       "source": "nt2",
+       "shift": 1.39,
+       "frames": 13451,
+       "loop": null,
+       "loop_score": 0.8
+      }
+     ]
+    },
+    {
+     "note": 80,
+     "takes": [
+      {
+       "file": "meow/80-0.wav",
+       "source": "softy",
+       "shift": 2.35,
+       "frames": 14787,
+       "loop": [
+        5896,
+        10527
+       ],
+       "loop_score": 0.957
+      },
+      {
+       "file": "meow/80-1.wav",
+       "source": "squeak",
+       "shift": -2.41,
+       "frames": 10143,
+       "loop": [
+        2535,
+        6206
+       ],
+       "loop_score": 0.96
+      }
+     ]
+    },
+    {
+     "note": 83,
+     "takes": [
+      {
+       "file": "meow/83-0.wav",
+       "source": "squeak",
+       "shift": 0.59,
+       "frames": 10143,
+       "loop": null,
+       "loop_score": 0.77
+      },
+      {
+       "file": "meow/83-1.wav",
+       "source": "kitten",
+       "shift": -1.33,
+       "frames": 18959,
+       "loop": [
+        6389,
+        8983
+       ],
+       "loop_score": 0.999
+      }
+     ]
+    },
+    {
+     "note": 86,
+     "takes": [
+      {
+       "file": "meow/86-0.wav",
+       "source": "kitten",
+       "shift": 1.67,
+       "frames": 18954,
+       "loop": [
+        10128,
+        12104
+       ],
+       "loop_score": 0.999
+      },
+      {
+       "file": "meow/86-1.wav",
+       "source": "squeak",
+       "shift": 3.59,
+       "frames": 10143,
+       "loop": [
+        2535,
+        7004
+       ],
+       "loop_score": 0.979
+      }
+     ]
+    },
+    {
+     "note": 89,
+     "takes": [
+      {
+       "file": "meow/89-0.wav",
+       "source": "kitten",
+       "shift": 4.67,
+       "frames": 18929,
+       "loop": [
+        6602,
+        8880
+       ],
+       "loop_score": 0.961
+      },
+      {
+       "file": "meow/89-1.wav",
+       "source": "squeak",
+       "shift": 6.59,
+       "frames": 10143,
+       "loop": [
+        2645,
+        6637
+       ],
+       "loop_score": 0.959
+      }
+     ]
+    },
+    {
+     "note": 92,
+     "takes": [
+      {
+       "file": "meow/92-0.wav",
+       "source": "kitten",
+       "shift": 7.67,
+       "frames": 18788,
+       "loop": [
+        10197,
+        11901
+       ],
+       "loop_score": 0.986
+      },
+      {
+       "file": "meow/92-1.wav",
+       "source": "squeak",
+       "shift": 9.59,
+       "frames": 10143,
+       "loop": [
+        2535,
+        6679
+       ],
+       "loop_score": 0.983
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "KITTENS",
+   "note0": 72,
+   "anchors": [
+    {
+     "note": 73,
+     "takes": [
+      {
+       "file": "kittens/73-0.wav",
+       "source": "greek",
+       "shift": -1.89,
+       "frames": 16356,
+       "loop": null,
+       "loop_score": 0.588
+      }
+     ]
+    },
+    {
+     "note": 76,
+     "takes": [
+      {
+       "file": "kittens/76-0.wav",
+       "source": "nthi",
+       "shift": 0.9,
+       "frames": 10584,
+       "loop": [
+        3196,
+        5422
+       ],
+       "loop_score": 0.919
+      }
+     ]
+    },
+    {
+     "note": 79,
+     "takes": [
+      {
+       "file": "kittens/79-0.wav",
+       "source": "softy",
+       "shift": 1.35,
+       "frames": 15083,
+       "loop": [
+        5970,
+        11114
+       ],
+       "loop_score": 0.938
+      }
+     ]
+    },
+    {
+     "note": 82,
+     "takes": [
+      {
+       "file": "kittens/82-0.wav",
+       "source": "squeak",
+       "shift": -0.41,
+       "frames": 10143,
+       "loop": [
+        2755,
+        6210
+       ],
+       "loop_score": 0.854
+      }
+     ]
+    },
+    {
+     "note": 85,
+     "takes": [
+      {
+       "file": "kittens/85-0.wav",
+       "source": "kitten",
+       "shift": 0.67,
+       "frames": 18946,
+       "loop": [
+        10016,
+        12030
+       ],
+       "loop_score": 0.999
+      }
+     ]
+    },
+    {
+     "note": 88,
+     "takes": [
+      {
+       "file": "kittens/88-0.wav",
+       "source": "kitten",
+       "shift": 3.67,
+       "frames": 18926,
+       "loop": [
+        9901,
+        11410
+       ],
+       "loop_score": 0.996
+      }
+     ]
+    },
+    {
+     "note": 91,
+     "takes": [
+      {
+       "file": "kittens/91-0.wav",
+       "source": "kitten",
+       "shift": 6.67,
+       "frames": 18931,
+       "loop": [
+        10122,
+        11927
+       ],
+       "loop_score": 0.991
+      }
+     ]
+    },
+    {
+     "note": 94,
+     "takes": [
+      {
+       "file": "kittens/94-0.wav",
+       "source": "kitten",
+       "shift": 9.67,
+       "frames": 15809,
+       "loop": [
+        6372,
+        7935
+       ],
+       "loop_score": 0.991
+      }
+     ]
+    },
+    {
+     "note": 97,
+     "takes": [
+      {
+       "file": "kittens/97-0.wav",
+       "source": "kitten",
+       "shift": 12.67,
+       "frames": 18435,
+       "loop": [
+        9558,
+        11512
+       ],
+       "loop_score": 0.994
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "TOMCATS",
+   "note0": 55,
+   "anchors": [
+    {
+     "note": 56,
+     "takes": [
+      {
+       "file": "tomcats/56-0.wav",
+       "source": "siamese",
+       "shift": -2.83,
+       "frames": 20039,
+       "loop": null,
+       "loop_score": 0.839
+      }
+     ]
+    },
+    {
+     "note": 59,
+     "takes": [
+      {
+       "file": "tomcats/59-0.wav",
+       "source": "siamese",
+       "shift": 0.17,
+       "frames": 20154,
+       "loop": [
+        10978,
+        12569
+       ],
+       "loop_score": 0.853
+      }
+     ]
+    },
+    {
+     "note": 62,
+     "takes": [
+      {
+       "file": "tomcats/62-0.wav",
+       "source": "shlo1",
+       "shift": -0.85,
+       "frames": 24255,
+       "loop": [
+        13873,
+        19141
+       ],
+       "loop_score": 0.92
+      }
+     ]
+    },
+    {
+     "note": 65,
+     "takes": [
+      {
+       "file": "tomcats/65-0.wav",
+       "source": "shhi2",
+       "shift": 0.22,
+       "frames": 24255,
+       "loop": [
+        12663,
+        13992
+       ],
+       "loop_score": 0.959
+      }
+     ]
+    },
+    {
+     "note": 68,
+     "takes": [
+      {
+       "file": "tomcats/68-0.wav",
+       "source": "purry",
+       "shift": -1.2,
+       "frames": 23153,
+       "loop": [
+        9528,
+        11337
+       ],
+       "loop_score": 0.871
+      }
+     ]
+    },
+    {
+     "note": 71,
+     "takes": [
+      {
+       "file": "tomcats/71-0.wav",
+       "source": "shhi1",
+       "shift": 1.47,
+       "frames": 22869,
+       "loop": [
+        12207,
+        13684
+       ],
+       "loop_score": 0.962
+      }
+     ]
+    },
+    {
+     "note": 74,
+     "takes": [
+      {
+       "file": "tomcats/74-0.wav",
+       "source": "pl4",
+       "shift": 1.27,
+       "frames": 15519,
+       "loop": [
+        4539,
+        6009
+       ],
+       "loop_score": 0.935
+      }
+     ]
+    },
+    {
+     "note": 77,
+     "takes": [
+      {
+       "file": "tomcats/77-0.wav",
+       "source": "pl4",
+       "shift": 4.27,
+       "frames": 16289,
+       "loop": [
+        4292,
+        6179
+       ],
+       "loop_score": 0.892
+      }
+     ]
+    },
+    {
+     "note": 80,
+     "takes": [
+      {
+       "file": "tomcats/80-0.wav",
+       "source": "pl4",
+       "shift": 7.27,
+       "frames": 15459,
+       "loop": [
+        4304,
+        5714
+       ],
+       "loop_score": 0.954
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "name": "HUNGRY",
+   "note0": 62,
+   "anchors": [
+    {
+     "note": 63,
+     "takes": [
+      {
+       "file": "hungry/63-0.wav",
+       "source": "imp5",
+       "shift": -9.6,
+       "frames": 24255,
+       "loop": [
+        6063,
+        7642
+       ],
+       "loop_score": 0.861
+      }
+     ]
+    },
+    {
+     "note": 66,
+     "takes": [
+      {
+       "file": "hungry/66-0.wav",
+       "source": "imp5",
+       "shift": -6.6,
+       "frames": 24255,
+       "loop": [
+        11343,
+        13017
+       ],
+       "loop_score": 0.882
+      }
+     ]
+    },
+    {
+     "note": 69,
+     "takes": [
+      {
+       "file": "hungry/69-0.wav",
+       "source": "imp5",
+       "shift": -3.6,
+       "frames": 24255,
+       "loop": null,
+       "loop_score": 0.776
+      }
+     ]
+    },
+    {
+     "note": 72,
+     "takes": [
+      {
+       "file": "hungry/72-0.wav",
+       "source": "imp5",
+       "shift": -0.6,
+       "frames": 24255,
+       "loop": [
+        12333,
+        13690
+       ],
+       "loop_score": 0.893
+      }
+     ]
+    },
+    {
+     "note": 75,
+     "takes": [
+      {
+       "file": "hungry/75-0.wav",
+       "source": "pl1",
+       "shift": -0.02,
+       "frames": 19821,
+       "loop": [
+        10235,
+        11923
+       ],
+       "loop_score": 0.912
+      }
+     ]
+    },
+    {
+     "note": 78,
+     "takes": [
+      {
+       "file": "hungry/78-0.wav",
+       "source": "nt2",
+       "shift": 2.39,
+       "frames": 13451,
+       "loop": null,
+       "loop_score": 0.666
+      }
+     ]
+    },
+    {
+     "note": 81,
+     "takes": [
+      {
+       "file": "hungry/81-0.wav",
+       "source": "nt2",
+       "shift": 5.39,
+       "frames": 13451,
+       "loop": null,
+       "loop_score": 0.623
+      }
+     ]
+    },
+    {
+     "note": 84,
+     "takes": [
+      {
+       "file": "hungry/84-0.wav",
+       "source": "nt2",
+       "shift": 8.39,
+       "frames": 13211,
+       "loop": [
+        4072,
+        5464
+       ],
+       "loop_score": 0.888
+      }
+     ]
+    },
+    {
+     "note": 87,
+     "takes": [
+      {
+       "file": "hungry/87-0.wav",
+       "source": "nt2",
+       "shift": 11.39,
+       "frames": 13451,
+       "loop": null,
+       "loop_score": 0.529
+      }
+     ]
+    }
+   ]
+  }
+ ],
+ "sources": [
+  {
+   "id": "greek",
+   "file": "commons-meows/src/greek_cat.wav",
+   "start": 0.12,
+   "end": 0.97,
+   "author": "Tsester",
+   "source": "https://commons.wikimedia.org/wiki/File:2015-11-24.\u03bd\u03b9\u03b1\u03bf\u03cd\u03c1\u03b9\u03c3\u03bc\u03b1.\u039d\u03b9\u03ac\u03bf\u03c5.noise_reduced.flac",
+   "license": "CC0",
+   "root_hz": 618.2
+  },
+  {
+   "id": "imp5",
+   "file": "commons-meows/src/impatient.wav",
+   "start": 7.87,
+   "end": 9.31,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:GettingOutImpatient.ogg",
+   "license": "Public domain",
+   "root_hz": 541.7
+  },
+  {
+   "id": "kitten",
+   "file": "cc0-meows/src/kitten_mew-1.wav",
+   "author": "AntumDeluge",
+   "source": "https://opengameart.org/content/kitten-mew",
+   "license": "CC0 1.0",
+   "end": 0.95,
+   "root_hz": 1066.6
+  },
+  {
+   "id": "meow",
+   "file": "cc0-meows/src/Meow.wav",
+   "author": "IgnasD",
+   "source": "https://opengameart.org/content/meow",
+   "license": "CC0 1.0",
+   "root_hz": 582.9
+  },
+  {
+   "id": "nt1",
+   "file": "commons-meows/src/notrip.wav",
+   "start": 0.49,
+   "end": 1.19,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:NoTrip.ogg",
+   "license": "Public domain",
+   "root_hz": 589.0
+  },
+  {
+   "id": "nt2",
+   "file": "commons-meows/src/notrip.wav",
+   "start": 2.66,
+   "end": 3.27,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:NoTrip.ogg",
+   "license": "Public domain",
+   "root_hz": 644.5
+  },
+  {
+   "id": "nthi",
+   "file": "commons-meows/src/notrip.wav",
+   "start": 7.56,
+   "end": 8.04,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:NoTrip.ogg",
+   "license": "Public domain",
+   "root_hz": 625.7
+  },
+  {
+   "id": "pl1",
+   "file": "commons-meows/src/pleading.wav",
+   "start": 0.25,
+   "end": 1.2,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:Meow_of_a_pleading_cat.oga",
+   "license": "Public domain",
+   "root_hz": 622.8
+  },
+  {
+   "id": "pl4",
+   "file": "commons-meows/src/pleading.wav",
+   "start": 9.39,
+   "end": 10.14,
+   "author": "Heismark",
+   "source": "https://commons.wikimedia.org/wiki/File:Meow_of_a_pleading_cat.oga",
+   "license": "Public domain",
+   "root_hz": 545.9
+  },
+  {
+   "id": "purry",
+   "file": "cc0-meows/src/cat_mewpurr2.wav",
+   "author": "Kerzoven",
+   "source": "https://opengameart.org/content/cat-purr-meow",
+   "license": "CC0 1.0",
+   "start": 0.2,
+   "end": 1.25,
+   "root_hz": 445.0,
+   "root_checked": "spectrogram: harmonics ~445, 890, 1335 Hz"
+  },
+  {
+   "id": "shhi1",
+   "file": "commons-meows/src/shorthair_food.wav",
+   "start": 0.32,
+   "end": 1.44,
+   "author": "PantheraLeo1359531",
+   "source": "https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav",
+   "license": "CC BY 4.0",
+   "root_hz": 453.8
+  },
+  {
+   "id": "shhi2",
+   "file": "commons-meows/src/shorthair_food.wav",
+   "start": 2.27,
+   "end": 3.88,
+   "author": "PantheraLeo1359531",
+   "source": "https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav",
+   "license": "CC BY 4.0",
+   "root_hz": 344.8
+  },
+  {
+   "id": "shlo1",
+   "file": "commons-meows/src/shorthair_food.wav",
+   "start": 5.12,
+   "end": 6.41,
+   "author": "PantheraLeo1359531",
+   "source": "https://commons.wikimedia.org/wiki/File:Weibliche_Britisch_Kurzhaar_will_Futter_C1277_MIAUEN.wav",
+   "license": "CC BY 4.0",
+   "root_hz": 308.4
+  },
+  {
+   "id": "siamese",
+   "file": "commons-meows/src/siamese.wav",
+   "start": 0.14,
+   "end": 1.09,
+   "author": "freemaster2",
+   "source": "https://commons.wikimedia.org/wiki/File:Meow_of_a_Siamese_cat_-_freemaster2.wav",
+   "license": "CC0",
+   "root_hz": 244.5
+  },
+  {
+   "id": "softy",
+   "file": "cc0-meows/src/cat_softmew.wav",
+   "author": "Kerzoven",
+   "source": "https://opengameart.org/content/cat-purr-meow",
+   "license": "CC0 1.0",
+   "start": 0.33,
+   "end": 1.05,
+   "root_hz": 725.0,
+   "root_checked": "spectrogram: harmonics ~730, 1450, 2150 Hz"
+  },
+  {
+   "id": "squeak",
+   "file": "cc0-meows/src/cat_softmew.wav",
+   "author": "Kerzoven",
+   "source": "https://opengameart.org/content/cat-purr-meow",
+   "license": "CC0 1.0",
+   "start": 1.32,
+   "end": 1.78,
+   "root_hz": 954.9
+  }
+ ]
+}

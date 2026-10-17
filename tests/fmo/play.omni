@@ -9,8 +9,10 @@ wait 20
 expect triggers 1
 wait 600
 expect triggers 1
-expect active 0
+expect active 1
 key 0 up
+wait 400
+expect active 0
 key 0 down
 wait 20
 expect triggers 2
