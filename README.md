@@ -8,6 +8,11 @@ X0X and Felucca.
 
 ![Cat Piano screen](docs/images/screen-playing.png)
 
+Listen (host renders of the firmware): [the four banks](docs/demos/catpiano-demo-v2.mp3),
+[four tracks recorded live](docs/demos/catpiano-demo-seq.mp3), [the arpeggiator](docs/demos/catpiano-demo-arp.mp3).
+Development notes: [firmware review](docs/notes/FIRMWARE-REVIEW.md), [cat piano plan](docs/notes/CATPIANO-PLAN.md),
+[sequencer and dual-core plan](docs/notes/SEQUENCER-DUALCORE-PLAN.md).
+
 > **Status:** runs on an FM-1 (installed with `tools/fm1_install.py`) and passes its host tests. CPU load on the
 > device is still to be measured (hold FX); the sequencer's per-track and per-step settings have no panel controls
 > yet (see [the roadmap](#roadmap)).
