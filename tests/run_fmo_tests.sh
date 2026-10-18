@@ -12,6 +12,7 @@ $CC -O1 -g -fsanitize=address,undefined -ffp-contract=off -Wall -Wextra -Werror 
 build/fmo/pitch_test
 build/fmo/dsp_test
 python3 tests/fmo/import_test.py
+python3 tests/install_test.py
 FMO_TEST_BANK=1 sh host/build_host.sh
 build/host/omni_host tests/fmo/play.omni build/fmo
 build/host/omni_host tests/fmo/controls.omni build/fmo

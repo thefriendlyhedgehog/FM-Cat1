@@ -1,14 +1,16 @@
 # Cat Piano
 
 A cat piano for the M-VAVE FM-1: each of the 27 keys plays a real cat's meow, tuned to its note. Four banks of
-cats, held notes that keep meowing, a pitch-bend knob, a 16-step loop, reverb and delay. Forked from
+cats, held notes that keep meowing, a pitch-bend knob, a four-track sequencer, an arpeggiator, reverb and delay.
+Forked from
 [Fart Machine One](https://github.com/adamcharleswilsonmusic-code/Fart-Machine-One), which is built on FoMni,
 X0X and Felucca.
 
 ![Cat Piano screen](docs/images/screen-playing.png)
 
-> **Status:** builds and passes its host tests. The first version (one bank) ran on an FM-1; this version
-> (banks, sustain, bend) has not been installed on one yet.
+> **Status:** runs on an FM-1 (installed with `tools/fm1_install.py`) and passes its host tests. CPU load on the
+> device is still to be measured (hold FX); the sequencer's per-track and per-step settings have no panel controls
+> yet (see [the roadmap](#roadmap)).
 
 ## Controls
 
@@ -96,3 +98,11 @@ GPL-3.0-only, as the firmwares it comes from: give the source to anyone you give
 recordings are CC0 1.0 or public domain, except one under CC BY 4.0 whose attribution must travel with the
 firmware. Credits and third-party notices are in [LICENSING.md](LICENSING.md). M-VAVE and FM-1 are trademarks
 of their owners; this project is not affiliated with them.
+
+## Roadmap
+
+- Panel controls and a step-grid screen for track length, division, swing, nudge, ratchets, conditions and mute
+  (the engine and its tests already have them).
+- Pattern save and load (sections A-D, chaining, undo) in the flash store.
+- MIDI clock in and out; sequenced notes to MIDI out.
+- Dual core (after Felucca 1.6.1), only if the measured CPU load calls for it.

@@ -4,7 +4,7 @@
 For each entry: a harmonic sieve over [start, end] picks the F0 (robust to octave errors), refined by the median
 of YIN frames near it, reported as root_hz. An entry with "root_checked" (a note on how it was checked) keeps
 its root_hz. --write stores root_hz back into the manifest.
-  python3 tools/measure_pitch.py samples/cc0-meows/manifest.json [--write]
+  python3 tools/measure_pitch.py samples/banks.json [--write]
 """
 import argparse, json, math, wave
 from pathlib import Path

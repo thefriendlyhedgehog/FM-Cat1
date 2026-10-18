@@ -2,7 +2,9 @@
 
 Prebuilt firmware users can follow [INSTALL.md](INSTALL.md) without compiling.
 These source-build steps target macOS or Linux with a C compiler, Git and Python 3.
-Docker is required unless using native Linux x86-64. Docker must be running.
+Docker is required unless using native Linux x86-64. Docker must be running. On Apple silicon it needs
+`linux/amd64` emulation, for example colima: `colima start --arch aarch64 --vm-type vz --vz-rosetta --mount "$PWD:w"`.
+Authoring new sample banks also needs numpy, ffmpeg and the Rubber Band CLI (see the README); building does not.
 
 ## Dependencies
 
@@ -41,18 +43,3 @@ The build checks entry placement, RAM/app capacity and low-level code boundaries
 The test suite covers sample import, playback, effects, panel/MIDI controls,
 sequencer timing, overdubbing, stop/clear, encoders, USB audio, TRS MIDI and storage.
 When a firmware package exists, it also checks OTA handling against that package.
-
-## Optional browser preview
-
-Install Emscripten SDK 4.0.23 and source its `emsdk_env.sh`, then:
-
-```sh
-sh web/emu/build.sh
-node tests/host/emu_test.mjs build/emu/omni.wasm
-node tests/fmo/sequencer_emu_test.mjs build/emu/omni.wasm
-python3 -m http.server 8791 --bind 127.0.0.1 --directory build/emu
-```
-
-Open http://127.0.0.1:8791/ and switch on. The preview runs the app's C playback
-and screen code. It does not simulate USB flashing or the physical audio circuitry.
-Native/browser performance does not measure the physical FM-1's CPU load.
